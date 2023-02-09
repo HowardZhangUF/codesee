@@ -21,6 +21,8 @@ namespace VehicleSimulator
 		int mRotateVelocity { get; }
 		string mMapFilePath { get; }
 		MapData mMapData { get; }
+		int mWidth { get; }
+		int mRotationDiameter { get; }
 
 		void SetName(string Name);
 		void SetStatus(ESimulatorStatus Status);
@@ -33,5 +35,7 @@ namespace VehicleSimulator
 		void SetRotateVelocity(int RotateVelocity);
 		void SetMapFilePath(string MapFilePath);
 		void SetMapData(MapData MapData);
+		void SetWidth(int Width);
+		void SetRotationDiameter(int RotationDiameter);
 	}
 }
