@@ -89,7 +89,7 @@ namespace VehicleSimulator
 					string targetName = targetString.Substring(0, firstBracketsIndex - 1);
 					string locationString = targetString.Substring(firstBracketsIndex + 1, lastBracketsIndex - firstBracketsIndex - 1);
 					string[] locationSplitString = locationString.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-					var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), targetName);
+					var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), targetName, rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
 					rSimulatorControl.StartMove(targetName, moveRequests);
 				}
 				else
@@ -97,12 +97,12 @@ namespace VehicleSimulator
 					string[] tmpStrings = cbMoveTarget.Text.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 					if (tmpStrings.Length == 2)
 					{
-						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(int.Parse(tmpStrings[0]), int.Parse(tmpStrings[1])));
+						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(int.Parse(tmpStrings[0]), int.Parse(tmpStrings[1])), rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
 						rSimulatorControl.StartMove(cbMoveTarget.Text, moveRequests);
 					}
 					else if (tmpStrings.Length == 3)
 					{
-						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(int.Parse(tmpStrings[0]), int.Parse(tmpStrings[1])), int.Parse(tmpStrings[2]));
+						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(int.Parse(tmpStrings[0]), int.Parse(tmpStrings[1])), int.Parse(tmpStrings[2]), rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
 						rSimulatorControl.StartMove(cbMoveTarget.Text, moveRequests);
 					}
 				}
@@ -229,6 +229,29 @@ namespace VehicleSimulator
 					dgvSimulatorInfo.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = rSimulatorInfo.mRotateVelocity;
 				}
 			}
+			else if (e.RowIndex == 5 && e.ColumnIndex == 1) // Width
+			{
+				if (int.TryParse(cellValue, out int newWidth))
+				{
+					rSimulatorInfo.SetWidth(newWidth);
+				}
+				else
+				{
+					dgvSimulatorInfo.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = rSimulatorInfo.mWidth;
+				}
+			}
+			else if (e.RowIndex == 5 && e.ColumnIndex == 3) // Rotation Diameter
+			{
+				if (int.TryParse(cellValue, out int newRotationDiameter))
+				{
+					rSimulatorInfo.SetRotationDiameter(newRotationDiameter);
+				}
+				else
+				{
+					dgvSimulatorInfo.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = rSimulatorInfo.mRotationDiameter;
+				}
+			}
+
 		}
 		private void SubscribeEvent_SimulatorProcess(SimulatorProcess rSimulatorProcess)
 		{
@@ -337,6 +360,14 @@ namespace VehicleSimulator
 			{
 				UpdateGui_SetSimulatorGoalList(rSimulatorInfo.mMapData);
 			}
+			else if (e.StatusName.Contains("Width"))
+			{
+				UpdateGui_SetSimulatorWidth(rSimulatorInfo.mWidth);
+			}
+			else if (e.StatusName.Contains("RotationDiameter"))
+			{
+				UpdateGui_SetSimulatorRotationDiameter(rSimulatorInfo.mRotationDiameter);
+			}
 		}
 		private void HandleEvent_HostCommunicatorConnectStateChanged(object sender, ConnectStateChangedEventArgs e)
 		{
@@ -393,6 +424,7 @@ namespace VehicleSimulator
 			dgv.Rows.Add("Y    ", "0", "Score    ", "0.00");
 			dgv.Rows.Add("Head    ", "0", "Battery    ", "0.00");
 			dgv.Rows.Add("TranslateVelocity    ", "800", "RotateVelocity    ", "90");
+			dgv.Rows.Add("Width (mm) ","700","RotationDiameter (mm) ","0");
 			dgv.ClearSelection();
 
 			dgv.Rows[1].Cells[1].ReadOnly = false;
@@ -402,6 +434,8 @@ namespace VehicleSimulator
 			dgv.Rows[3].Cells[3].ReadOnly = false;
 			dgv.Rows[4].Cells[1].ReadOnly = false;
 			dgv.Rows[4].Cells[3].ReadOnly = false;
+			dgv.Rows[5].Cells[1].ReadOnly = false;
+			dgv.Rows[5].Cells[3].ReadOnly = false;
 		}
 		private void UpdateGui_UpdateSimulatorInfo()
 		{
@@ -418,6 +452,8 @@ namespace VehicleSimulator
 				UpdateGui_SetSimulatorIsConnect(rHostCommunicator.mIsConnected);
 				UpdateGui_SetSimulatorHostIpPort(rHostCommunicator.GetConfig("RemoteIpPort"));
 				UpdateGui_SetSimulatorGoalList(rSimulatorInfo.mMapData);
+				UpdateGui_SetSimulatorWidth(rSimulatorInfo.mWidth);
+				UpdateGui_SetSimulatorRotationDiameter(rSimulatorInfo.mRotationDiameter);
 			}
 			else
 			{
@@ -432,6 +468,8 @@ namespace VehicleSimulator
 				UpdateGui_SetSimulatorIsConnect(default(bool));
 				UpdateGui_SetSimulatorHostIpPort(string.Empty);
 				UpdateGui_SetSimulatorGoalList(null);
+				UpdateGui_SetSimulatorWidth(default(int));
+				UpdateGui_SetSimulatorRotationDiameter(default(int));
 			}
 		}
 		private void UpdateGui_SetSimulatorName(string Value)
@@ -508,8 +546,16 @@ namespace VehicleSimulator
 				}
 			}
 		}
+		private void UpdateGui_SetSimulatorWidth(int Value)
+		{
+			dgvSimulatorInfo.InvokeIfNecessary(() => { dgvSimulatorInfo.Rows[5].Cells[1].Value = Value; });
+		}
+		private void UpdateGui_SetSimulatorRotationDiameter(int Value)
+		{
+			dgvSimulatorInfo.InvokeIfNecessary(() => { dgvSimulatorInfo.Rows[5].Cells[3].Value = Value; });
+		}
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+		private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
