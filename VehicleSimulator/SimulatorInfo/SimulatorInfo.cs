@@ -24,6 +24,8 @@ namespace VehicleSimulator
 		public int mRotateVelocity { get; private set; } = 90;
 		public string mMapFilePath { get; private set; } = string.Empty;
 		public MapData mMapData { get; private set; } = null;
+		public int mWidth { get; private set; } = 700;
+		public int mRotationDiameter { get; private set; } = 0;
 
 		public SimulatorInfo(string Name)
 		{
@@ -124,6 +126,22 @@ namespace VehicleSimulator
 		{
 			mMapData = MapData;
 			RaiseEvent_StatusUpdated("MapData");
+		}
+		public void SetWidth(int Width)
+		{
+			if (mWidth != Width)
+			{
+				mWidth = Width;
+				RaiseEvent_StatusUpdated("Width");
+			}
+		}
+		public void SetRotationDiameter(int RotationDiameter)
+		{
+			if (mRotationDiameter != RotationDiameter)
+			{
+				mRotationDiameter = RotationDiameter;
+				RaiseEvent_StatusUpdated("RotationDiameter");
+			}
 		}
 
 		protected virtual void RaiseEvent_StatusUpdated(string StatusName, bool Sync = true)
