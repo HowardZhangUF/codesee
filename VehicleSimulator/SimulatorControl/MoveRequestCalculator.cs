@@ -86,6 +86,71 @@ namespace VehicleSimulator
 			}
 		}
 
+		public List<MoveRequest> Calculate(Point Start, string TargetName,int Width,int RotationDiameter)
+		{
+			if (mMap.mGoals.Any(o => o.mName == TargetName))
+			{
+				var Goal = mMap.mGoals.First(o => o.mName == TargetName);
+				if (IsGoalRequestToward(Goal))
+				{
+					return Calculate(Start, new Point(Goal.mX, Goal.mY), (int)Goal.mToward,Width,RotationDiameter, IsGoalMoveBackward(Goal));
+				}
+				else
+				{
+					return Calculate(Start, new Point(Goal.mX, Goal.mY), Width,RotationDiameter,IsGoalMoveBackward(Goal));
+				}
+			}
+			else
+			{
+				return null;
+
+			}
+		}
+		public List<MoveRequest> Calculate(Point Start, Point End, int Width, int RotationDiameter, bool IsMoveBackward = false)
+		{
+			int SizeChoose;
+			if (Width >= RotationDiameter) { SizeChoose=Width; } else { SizeChoose = RotationDiameter; }
+			if (mMap == null)
+			{
+				return new List<MoveRequest>() { new MoveRequest(End.mX, End.mY, IsMoveBackward) };
+			}
+			else
+			{
+				mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose/2, out PathFindingResult pathfindingResult, out Module.Pathfinding.Object.Path path);
+				if (path == null)
+				{
+					return null;
+				}
+				else
+				{
+					path = mPathOptimizer.OptimizePath(path, SizeChoose);
+					return Convert(path, IsMoveBackward);
+				}
+			}
+		}
+		public List<MoveRequest> Calculate(Point Start, Point End, int EndToward,int Width,int RotationDiameter, bool IsMoveBackward = false)
+		{
+			int SizeChoose;
+			if (Width >= RotationDiameter) { SizeChoose = Width; } else { SizeChoose = RotationDiameter; }
+			if (mMap == null)
+			{
+				return new List<MoveRequest>() { new MoveRequest(End.mX, End.mY, EndToward, IsMoveBackward) };
+			}
+			else
+			{
+				mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose / 2, out PathFindingResult pathfindingResult, out Module.Pathfinding.Object.Path path);
+				if (path == null)
+				{
+					return null;
+				}
+				else
+				{
+					path = mPathOptimizer.OptimizePath(path, SizeChoose );
+					return Convert(path, EndToward, IsMoveBackward);
+				}
+			}
+		}
+
 		private List<MoveRequest> Convert(Module.Pathfinding.Object.Path Path, bool IsMoveBackward = false)
 		{
 			return Path.mPoints.Skip(1).Select(o => new MoveRequest(o.mX, o.mY, IsMoveBackward)).ToList();
