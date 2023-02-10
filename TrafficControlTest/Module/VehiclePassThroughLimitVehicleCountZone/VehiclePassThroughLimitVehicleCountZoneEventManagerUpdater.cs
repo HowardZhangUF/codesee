@@ -150,65 +150,86 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 				{
 					for (int j = 0; j < limitVehicleCountZoneInfos.Count; ++j)
 					{
+						int distance;
+						if(IsQualifiedToAddInLine(vehicleInfos[i],limitVehicleCountZoneInfos[j],limitVehicleCountZoneInfos,out distance))
+                        {
+                            if (vehicleInfos[i].mCurrentState == "Pause")
+                                Console.WriteLine($"車輛{vehicleInfos[i].mName},距離{distance},限車區號碼{limitVehicleCountZoneInfos[j].mName}");
+
+                            VehicleAddInLine(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j],distance);
+                        }
+						else
+                        {
+							VehicleRemoveFromLine(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j]);
+                        }
+
+						DisConnectedVehicleRemoveFromLine(vehicleInfos,limitVehicleCountZoneInfos[j]);
+
+						ReleaseOneCarAndPauseRestofAll(vehicleInfos,limitVehicleCountZoneInfos[j],currentEvents);
+						
+						//foreach(var Car in limitVehicleCountZoneInfos[j].mCarInLineOfLimitVehicleCountZone)
+      //                      Console.WriteLine($"車名{Car.Key},距離{Car.Value},限車區號碼{limitVehicleCountZoneInfos[j].mName}");
+
+						
 						////若限車區 讓車字典含值
 						//if (limitVehicleCountZoneInfos[j].mLetgo.ContainsKey(vehicleInfos[i].mName))
 						//{
 						//	limitCountZoneLetgoCleanup(vehicleInfos[i], vehicleInfos[i].mCurrentState, limitVehicleCountZoneInfos, j);
 						//}
 						// 如果自走車已經走到限車區內
-						if (IsVehicleInLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
-						{
-							if (IsILimitVehicleCountZoneFull(limitVehicleCountZoneInfos[j]))
-							{
-								// 如果自走車不在該區域的允許移動名單內
-								if (!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
-								{
-                                    //Console.WriteLine($"車輛{vehicleInfos[i].mName},進入第一個if 條件:{!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j])}");
-									IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], 0);
-									currentEvents.Add(tmp);
-								}
-							}
-						}
-						// 如果自走車還沒走到限車區內
-						else
-						{
-							//其他車 且不包含會去Park or Dock的車
-							List<IVehicleInfo> OtherVehicleInfos = vehicleInfos.Where(o => o.mName != vehicleInfos[i].mName && !o.mCurrentTarget.Contains("Park") && !o.mCurrentTarget.Contains("Dock") && o.mCurrentMapName == vehicleInfos[i].mCurrentMapName).ToList();
-							// 如果車子路徑線有穿越限車區
-							if (IsVehiclePassThroughLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
-							{
-								//自走車 是否為會去Park或Dock的車
-								//if(vehicleInfos[i].mCurrentTarget.Contains("Park") || vehicleInfos[i].mCurrentTarget.Contains("Dock"))//主要車 前往park or dock
-								//{
-								//	// 自走車是否會擋到其他不會去Park的車
-								//	//if (IsParkCarWillBlockOtherCarPassLimitZone(vehicleInfos[i], OtherVehicleInfos, limitVehicleCountZoneInfos[j]))
-        // //                           {
-        // //                               Console.WriteLine($"停止車輛事件觸發");
-								//	//	IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], 0);
-								//	//	currentEvents.Add(tmp);
-								//	//	rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateState(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j].mName, PassThroughState.WillLetgo);
-								//	//}
-									
-									
-								//}
+						//if (IsVehicleInLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
+						//{
+						//	if (IsILimitVehicleCountZoneFull(limitVehicleCountZoneInfos[j]))
+						//	{
+						//		// 如果自走車不在該區域的允許移動名單內
+						//		if (!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
+						//		{
+						//                              //Console.WriteLine($"車輛{vehicleInfos[i].mName},進入第一個if 條件:{!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j])}");
+						//			IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], 0);
+						//			currentEvents.Add(tmp);
+						//		}
+						//	}
+						//}
+						//// 如果自走車還沒走到限車區內
+						//else
+						//{
+						//	//其他車 且不包含會去Park or Dock的車
+						//	List<IVehicleInfo> OtherVehicleInfos = vehicleInfos.Where(o => o.mName != vehicleInfos[i].mName && !o.mCurrentTarget.Contains("Park") && !o.mCurrentTarget.Contains("Dock") && o.mCurrentMapName == vehicleInfos[i].mCurrentMapName).ToList();
+						//	// 如果車子路徑線有穿越限車區
+						//	if (IsVehiclePassThroughLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
+						//	{
+						//		//自走車 是否為會去Park或Dock的車
+						//		//if(vehicleInfos[i].mCurrentTarget.Contains("Park") || vehicleInfos[i].mCurrentTarget.Contains("Dock"))//主要車 前往park or dock
+						//		//{
+						//		//	// 自走車是否會擋到其他不會去Park的車
+						//		//	//if (IsParkCarWillBlockOtherCarPassLimitZone(vehicleInfos[i], OtherVehicleInfos, limitVehicleCountZoneInfos[j]))
+						//  // //                           {
+						//  // //                               Console.WriteLine($"停止車輛事件觸發");
+						//		//	//	IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], 0);
+						//		//	//	currentEvents.Add(tmp);
+						//		//	//	rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateState(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j].mName, PassThroughState.WillLetgo);
+						//		//	//}
 
-								// 該限車區為滿的
-								if (IsILimitVehicleCountZoneFull(limitVehicleCountZoneInfos[j]))
-								{
-									int distance = GetDistanceBetweenVehicleAndLimitVehicleCountZoneAlongPathLine(vehicleInfos[i], limitVehicleCountZoneInfos[j]);
-									// 車子不是限車區裡面的車，且即將通過限車區
-									// 加上距離大於 0 的條件是為了避免運算溢位的錯誤
-									// 距離等於 0 代表車子在限車區內部
-									if (!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]) && distance >= 0 && distance < mDistanceThreshold)
-									{
-										//Console.WriteLine($"車輛{vehicleInfos[i].mName},進入第二個if 條件:{!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i],limitVehicleCountZoneInfos[j])}");
-										
-										IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], distance);
-										currentEvents.Add(tmp);
-									}
-								}
-							}
-						}
+
+						//		//}
+
+						//		// 該限車區為滿的
+						//		if (IsILimitVehicleCountZoneFull(limitVehicleCountZoneInfos[j]))
+						//		{
+						//			int distance = GetDistanceBetweenVehicleAndLimitVehicleCountZoneAlongPathLine(vehicleInfos[i], limitVehicleCountZoneInfos[j]);
+						//			// 車子不是限車區裡面的車，且即將通過限車區
+						//			// 加上距離大於 0 的條件是為了避免運算溢位的錯誤
+						//			// 距離等於 0 代表車子在限車區內部
+						//			if (!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]) && distance >= 0 && distance < mDistanceThreshold)
+						//			{
+						//				//Console.WriteLine($"車輛{vehicleInfos[i].mName},進入第二個if 條件:{!IsVehicleAllowedMoveBeforeLimitVehicleCountZone(vehicleInfos[i],limitVehicleCountZoneInfos[j])}");
+
+						//				IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], distance);
+						//				currentEvents.Add(tmp);
+						//			}
+						//		}
+						//	}
+						//}
 					}
 				}
 
@@ -236,12 +257,87 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 						rVehiclePassThroughLimitVehicleCountZoneEventManager.Remove(lastEvents[i].mName);
 					}
 				}
+
+			}
+		}
+
+        /// <summary>判斷該車輛是否具有資格加入該限車區排隊隊伍</summary>		
+        private bool IsQualifiedToAddInLine(IVehicleInfo VehicleInfo,ILimitVehicleCountZoneInfo limitVehicleCountZoneInfo,List<ILimitVehicleCountZoneInfo> limitVehicleCountZoneInfos,out int distance)
+        {
+			//有資格定義為 車在聯集限車區中或在閾值內 則所有聯集號碼的限車區隊伍均列第一位
+			//               在一般限車區中或在閾值內 則該限車區隊伍列第一位
+
+			
+
+			if (limitVehicleCountZoneInfo.mIsUnioned)
+				distance = GetShortestDistanceBetweenVehicleAndUnionLimitVehicleCountZoneAlongPathLine(VehicleInfo, limitVehicleCountZoneInfos, limitVehicleCountZoneInfo.mUnionId);				
+			else
+				distance = GetDistanceBetweenVehicleAndLimitVehicleCountZoneAlongPathLine(VehicleInfo, limitVehicleCountZoneInfo);
+			
+
+			if (distance >=0 && distance < mDistanceThreshold)
+			{
+				return true;
+			}
+			return false;
+        }
+		/// <summary> 車輛 加入 以距離限車區最短為優先的 隊伍 </summary>
+		private void VehicleAddInLine(String VehicleName,ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo,int distance)
+        {
+			LimitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone[VehicleName] = distance;
+			//由距離排序
+			LimitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone = LimitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone.OrderBy(o => o.Value).ToDictionary(x => x.Key, x => x.Value);
+		}
+		/// <summary>車輛 移除限車區隊伍</summary>
+		private void VehicleRemoveFromLine(String VehicleName, ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo)
+        {
+			LimitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone.Remove(VehicleName);
+        }
+		/// <summary>斷線VM的車輛 移除限車區隊伍</summary>
+		private void DisConnectedVehicleRemoveFromLine(List<IVehicleInfo> vehicleInfos, ILimitVehicleCountZoneInfo limitVehicleCountZoneInfo)
+		{
+			//所有在限車區隊伍的車輛 (可能有包含已經斷線的車輛)
+			List<String> VehiclesInLimitVehcileCountZoneLine = limitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone.Keys.ToList();
+			//現在還連線的所有車輛
+			List<String> CurrentVehicles = vehicleInfos.Select(o => o.mName).ToList();
+			foreach (var vehicleInLimitVehcileCountZoneLine in VehiclesInLimitVehcileCountZoneLine)
+			{
+				if (!CurrentVehicles.Contains(vehicleInLimitVehcileCountZoneLine))
+				{
+					VehicleRemoveFromLine(vehicleInLimitVehcileCountZoneLine, limitVehicleCountZoneInfo);
+				}
+			}
+
+		}
+		/// <summary>每次只釋放一輛車通過限車區 其餘暫停</summary>
+		private void ReleaseOneCarAndPauseRestofAll(List<IVehicleInfo>vehicleInfos,ILimitVehicleCountZoneInfo limitVehicleCountZoneInfo,List<IVehiclePassThroughLimitVehicleCountZoneEvent> currentEvents)
+        {
+			Dictionary<string, int> CarInLineOfLimitVehicleCountZone = limitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone;
+			String VehicleCanGo = CarInLineOfLimitVehicleCountZone.Count == 0 ? "" :CarInLineOfLimitVehicleCountZone.First().Key;
+
+
+			foreach (var CarToDistance in limitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone)
+			{
+				if (CarToDistance.Key != VehicleCanGo)
+				{
+					IVehicleInfo vehicleInfo = vehicleInfos.Find(o => o.mName == CarToDistance.Key);
+					IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfo, limitVehicleCountZoneInfo, CarToDistance.Value);
+					currentEvents.Add(tmp);
+				}
 			}
 		}
 		/// <summary>計算指定 IVehicleInfo 是否在指定 ILimitVehicleCountZoneInfo 區域內</summary>
-		private bool IsVehicleInLimitVehicleCountZone(IVehicleInfo VehicleInfo, ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo)
+		private bool IsVehicleInLimitVehicleCountZone(IVehicleInfo VehicleInfo, IRectangle2D LimitVehicleCountZoneRange)
 		{
-			return LimitVehicleCountZoneInfo.mRange.IsIncludePoint(VehicleInfo.mLocationCoordinate);
+			List<IPoint2D> VehicleVertices = new List<IPoint2D>();
+			
+			IPoint2D VehicleCenter = VehicleInfo.mLocationCoordinate;
+			int VehicleRadius = VehicleInfo.mTotalFrameRadius / 2;
+			VehicleVertices.Add(new Point2D(VehicleCenter.mX + VehicleRadius, VehicleCenter.mY + VehicleRadius));
+			VehicleVertices.Add(new Point2D(VehicleCenter.mX + VehicleRadius, VehicleCenter.mY - VehicleRadius));
+			VehicleVertices.Add(new Point2D(VehicleCenter.mX - VehicleRadius, VehicleCenter.mY + VehicleRadius));
+			VehicleVertices.Add(new Point2D(VehicleCenter.mX - VehicleRadius, VehicleCenter.mY + VehicleRadius));
+			return LimitVehicleCountZoneRange.IsIncludeRectangle(VehicleVertices);
 		}
 		/// <summary>計算指定 IVehicleInfo 的路徑是否有穿越指定 ILimitVehicleCountZoneInfo 區域</summary>
 		private bool IsVehiclePassThroughLimitVehicleCountZone(IVehicleInfo VehicleInfo, ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo)
@@ -287,7 +383,7 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 			
 			if (VehicleCurrentState == "Pause")
 			{				
-				if (IsVehicleInLimitVehicleCountZone(vehicleInfo, limitVehicleCountZoneInfos[limitVehicleIndex]))
+				if (IsVehicleInLimitVehicleCountZone(vehicleInfo, limitVehicleCountZoneInfos[limitVehicleIndex].mRange))
 				{
 					if (limitVehicleCountZoneInfos[limitVehicleIndex].mIsUnioned)
 					{
@@ -347,7 +443,7 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 						List<ILimitVehicleCountZoneInfo> unionedZoneInfos = rLimitVehicleCountZoneInfoManager.GetItems().Where(o => o.mUnionId == unionId).ToList();
 						
 						
-						if (unionedZoneInfos.Any(o => GeometryAlgorithm.IsAnyPointInside(car.mPath, o.mRange)) && !unionedZoneInfos.Any(o=>IsVehicleInLimitVehicleCountZone(VehicleInfo,o)))
+						if (unionedZoneInfos.Any(o => GeometryAlgorithm.IsAnyPointInside(car.mPath, o.mRange)) && !unionedZoneInfos.Any(o=>IsVehicleInLimitVehicleCountZone(VehicleInfo,o.mRange)))
 						{
 							//Console.WriteLine($"進入聯集區域 條件二");
 							IPoint2D MainCarEnterpoint = VehicleInfo.mPath.Where(o => unionedZoneInfos.Any(s => GeometryAlgorithm.IsPointInside(o, s.mRange))).First();
@@ -488,13 +584,14 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 		}
 
 
-        /// <summary>計算指定 IVehicleInfo 與指定 ILimitVehicleCountZoneInfo 的距離(沿著路徑線計算)</summary>
-        private int GetDistanceBetweenVehicleAndLimitVehicleCountZoneAlongPathLine(IVehicleInfo VehicleInfo, ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo)
+		/// <summary>計算指定 IVehicleInfo 與指定 ILimitVehicleCountZoneInfo 的距離(沿著路徑線計算)</summary>
+		private int GetDistanceBetweenVehicleAndLimitVehicleCountZoneAlongPathLine(IVehicleInfo VehicleInfo, ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo)
 		{
-			int result = 0;
-			if (!LimitVehicleCountZoneInfo.mRange.IsIncludePoint(VehicleInfo.mLocationCoordinate))
+			int distance = mDistanceThreshold * 3;//預設為該車無任務且不在限車區內 或任務路線不會經過該限車區
+			
+			if (!IsVehicleInLimitVehicleCountZone(VehicleInfo,LimitVehicleCountZoneInfo.mRange))
 			{
-				if (VehicleInfo.mPathDetail != null && VehicleInfo.mPathDetail.Count > 0)
+				if (VehicleInfo.mPathDetail != null && VehicleInfo.mPathDetail.Count > 1)
 				{
 					List<IPoint2D> fullPath = new List<IPoint2D>();
 					fullPath.Add(VehicleInfo.mLocationCoordinate);
@@ -508,14 +605,40 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 							// 找到交點
 							List<IPoint2D> points = fullPath.Take(i + 1).ToList();
 							points.Add(intersectionPoint.ElementAt(0));
-							result = (int)GeometryAlgorithm.GetDistance(points);
+							distance = (int)GeometryAlgorithm.GetDistance(points);
+							distance -= VehicleInfo.mTotalFrameRadius / 2;//扣掉車子中心到外框的距離
+
 							break;
 						}
 					}
 				}
+
 			}
-			return result;
+			else
+            {
+				distance = 0;//車在限車區內
+            }
+			return distance;
 		}
+		/// <summary>計算指定 IVehicleInfo 與 所有ILimitVehicleCountZoneInfo 的最短距離(沿著路徑線計算)</summary>
+		private int GetShortestDistanceBetweenVehicleAndUnionLimitVehicleCountZoneAlongPathLine(IVehicleInfo VehicleInfo, List<ILimitVehicleCountZoneInfo> limitVehicleCountZoneInfos,int UnionId)
+        {
+			int distance = mDistanceThreshold*3;//預設閾值距離3倍(只要大於1倍即可 無特別意義)
+			int mindistance=distance;
+			foreach(var limitVehicleCountZoneInfo in limitVehicleCountZoneInfos)
+            {
+				if (limitVehicleCountZoneInfo.mUnionId == UnionId)
+				{
+					distance = GetDistanceBetweenVehicleAndLimitVehicleCountZoneAlongPathLine(VehicleInfo, limitVehicleCountZoneInfo);
+					if (distance < mindistance)
+						mindistance = distance;
+					else if (distance == 0)//出現車輛在限車區
+						return 0;
+				}
+			}
+				
+			return mindistance;
+        }
 
 		/// <summary>查詢指定的 ILimitVehicleCountZoneInfo 的當前資訊。若該區有其他區聯集，會一同計算</summary>
 		private static List<Tuple<string, DateTime>> GetCurrentVehicleList(ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo, ILimitVehicleCountZoneInfoManager LimitVehicleCountZoneInfoManager)
