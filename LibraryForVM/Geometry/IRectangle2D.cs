@@ -1,4 +1,4 @@
-﻿
+﻿using System.Collections.Generic;
 namespace LibraryForVM
 {
 	public interface IRectangle2D
@@ -30,6 +30,8 @@ namespace LibraryForVM
 		void Amplify(int OffsetX, int OffsetY);
 		/// <summary>判斷是否包含特定點</summary>
 		bool IsIncludePoint(IPoint2D Point);
+		/// <summary>判斷是否包含特定長方形</summary>
+		bool IsIncludeRectangle(List<IPoint2D> RectangleVertices);
 		string ToString();
 	}
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 namespace LibraryForVM
 {
 	[Serializable]
@@ -37,6 +37,16 @@ namespace LibraryForVM
 		{
 			return (Point.mX >= mMinPoint.mX && Point.mX <= mMaxPoint.mX && Point.mY >= mMinPoint.mY && Point.mY <= mMaxPoint.mY);
 		}
+		public bool IsIncludeRectangle(List<IPoint2D> RectangleVertices)
+        {
+			//若任一長方形頂點(外來者)在 主要長方形內 則判斷 主要長方形包含(外來者長方形)
+			foreach(var RectangleVertice in RectangleVertices)
+            {
+				if (IsIncludePoint(RectangleVertice))
+					return true;
+            }
+			return false;
+        }
 		public override string ToString()
 		{
 			return $"{mMaxPoint.ToString()},{mMinPoint.ToString()}";
