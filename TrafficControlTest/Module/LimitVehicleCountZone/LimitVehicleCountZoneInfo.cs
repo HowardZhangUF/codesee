@@ -21,6 +21,7 @@ namespace TrafficControlTest.Module.LimitVehicleCountZone
 		public TimeSpan mCurrentStatusDuration { get { return DateTime.Now.Subtract(mTimestampOfStatusChanged); } }
 		public DateTime mLastUpdated { get; private set; } = DateTime.Now;
 		public Dictionary<string, string> mLetgo { get; set; } = new Dictionary<string, string>();
+		public Dictionary<string, int> mCarInLineOfLimitVehicleCountZone { get; set; } = new Dictionary<string, int>();
 
 		private DateTime mTimestampOfStatusChanged = DateTime.Now;
 
