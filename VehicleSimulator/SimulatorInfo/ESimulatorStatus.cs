@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace VehicleSimulator
 {
+	/// <summary>
+	/// 車輛狀態
+	/// </summary>
 	public enum ESimulatorStatus
 	{
 		None,

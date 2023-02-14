@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 namespace VehicleSimulator
 {
 	//功能:
-	//1.更改設定:每個模擬車之動態狀態(如:車輛目前狀態(行走中、暫停...))、靜態狀態(如:行走速度)
-	//2.創建模擬車
+	//1.更改設定:每個模擬車之動態狀態(如:車輛目前狀態(行走中、暫停、充電中...))、靜態狀態(如:行走速度、地圖讀取)
+	//2.模擬車之初始化
+	//
+	//方法(Method):
+	//SetXXX:設定XXX,若其值與原始值不同，更新為新數值並記錄在Log上
+	//剩餘四個方法(SimulatorInfo、RaiseEvent_StatusUpdated、IsApproximatelyEqual、ConvertToString)已於命名中宣告其功能，故不註解
+	//
+	///<TODO> 可編輯車輛名稱 </TODO>
+
 
 	public class SimulatorInfo : ISimulatorInfo
 	{
