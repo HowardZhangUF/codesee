@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+
 
 namespace VehicleSimulator
 {
@@ -48,13 +50,101 @@ namespace VehicleSimulator
 				{
 					i++;
 				}
+				
 			}
+			
 
 			if (string.IsNullOrEmpty(mCurrentDisplayedSimulatorName))
 			{
 				UpdateGui_ChangeDisplaySimulator(mSimulatorShortcutCollection.First().Key);
 			}
+
 		}
+		private void btnTxt_Click(object sender, EventArgs e)
+		{
+
+
+			TxtInfo rTxtInfo = new TxtInfo();
+			List<string> ListReadLine = new List<string>(); 
+			string TxtFilePath = rTxtInfo.TxtChoose();
+
+			if (TxtFilePath != null)
+			{
+				ListReadLine = rTxtInfo.TxtRead(TxtFilePath);
+				int index = 0;//用於List讀取
+				int i = mStartIndexOfName;//用於車輛創建
+				bool ContinueLoop = true;
+
+				while (ContinueLoop)
+                {
+					var StringReadLine = ListReadLine[index];
+					switch(StringReadLine)
+                    {
+						case "Simulator:": //TO DO:新增車子數量
+							index++;
+							StringReadLine= ListReadLine[index];
+							for(int count=0;count< Convert.ToInt32(StringReadLine); count++)
+                            {
+								string prefix = "Simulator";
+								while (true)
+								{
+									string simulatorName = prefix + i.ToString().PadLeft(3, '0');
+									if (!rCore.IsSimulatorProcessExist(simulatorName))
+									{
+										rCore.AddSimulatorProcess(simulatorName);
+										break;
+									}
+									else
+									{
+										i++;
+									}
+
+								}
+
+
+								if (string.IsNullOrEmpty(mCurrentDisplayedSimulatorName))
+								{
+									UpdateGui_ChangeDisplaySimulator(mSimulatorShortcutCollection.First().Key);
+								}
+
+
+							}
+
+							index++;
+							break;
+
+						case "Next:":  //TO DO:將迴圈座標放進各個車中
+							index++;
+							StringReadLine = ListReadLine[index];
+
+
+							index++;
+							break;
+
+						case "End":
+							ContinueLoop = false;
+
+							break;
+
+						case null:
+							ContinueLoop = false;
+
+							break;
+
+
+                    }
+
+				}
+				
+
+
+
+
+
+            }
+            
+		}
+
 		private void btnRemoveSimulator_Click(object sender, EventArgs e)
 		{
 			if (!string.IsNullOrEmpty(mCurrentDisplayedSimulatorName))
@@ -140,5 +230,5 @@ namespace VehicleSimulator
 				}
 			}
 		}
-	}
+    }
 }
