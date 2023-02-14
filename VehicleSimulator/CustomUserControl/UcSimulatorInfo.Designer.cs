@@ -39,7 +39,7 @@
             this.txtHostIpPort = new System.Windows.Forms.TextBox();
             this.cbGoalList = new System.Windows.Forms.ComboBox();
             this.cbMoveTarget = new System.Windows.Forms.ComboBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnSimulatorSetAndMove = new System.Windows.Forms.Button();
             this.SetAndMoveTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSimulatorInfo)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
@@ -81,7 +81,7 @@
             this.tableLayoutPanel1.Controls.Add(this.txtHostIpPort, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.cbGoalList, 1, 7);
             this.tableLayoutPanel1.Controls.Add(this.cbMoveTarget, 1, 5);
-            this.tableLayoutPanel1.Controls.Add(this.button1, 0, 8);
+            this.tableLayoutPanel1.Controls.Add(this.btnSimulatorSetAndMove, 0, 8);
             this.tableLayoutPanel1.Controls.Add(this.SetAndMoveTextBox, 1, 8);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(11, 10);
@@ -247,7 +247,7 @@
             this.cbGoalList.ForeColor = System.Drawing.Color.White;
             this.cbGoalList.FormattingEnabled = true;
             this.cbGoalList.Location = new System.Drawing.Point(153, 201);
-            this.cbGoalList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cbGoalList.Margin = new System.Windows.Forms.Padding(4);
             this.cbGoalList.Name = "cbGoalList";
             this.cbGoalList.Size = new System.Drawing.Size(290, 28);
             this.cbGoalList.TabIndex = 11;
@@ -261,38 +261,37 @@
             this.cbMoveTarget.ForeColor = System.Drawing.Color.White;
             this.cbMoveTarget.FormattingEnabled = true;
             this.cbMoveTarget.Location = new System.Drawing.Point(153, 121);
-            this.cbMoveTarget.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cbMoveTarget.Margin = new System.Windows.Forms.Padding(4);
             this.cbMoveTarget.Name = "cbMoveTarget";
             this.cbMoveTarget.Size = new System.Drawing.Size(290, 28);
             this.cbMoveTarget.TabIndex = 12;
             this.cbMoveTarget.SelectedIndexChanged += new System.EventHandler(this.cbMoveTarget_SelectedIndexChanged);
             // 
-            // button1
+            // btnSimulatorSetAndMove
             // 
-            this.button1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.ForeColor = System.Drawing.Color.White;
-            this.button1.Location = new System.Drawing.Point(3, 238);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(143, 28);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "SetAndMove";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.btnSimulatorSetAndMove_Click);
+            this.btnSimulatorSetAndMove.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.btnSimulatorSetAndMove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSimulatorSetAndMove.ForeColor = System.Drawing.Color.White;
+            this.btnSimulatorSetAndMove.Location = new System.Drawing.Point(3, 238);
+            this.btnSimulatorSetAndMove.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSimulatorSetAndMove.Name = "btnSimulatorSetAndMove";
+            this.btnSimulatorSetAndMove.Size = new System.Drawing.Size(143, 28);
+            this.btnSimulatorSetAndMove.TabIndex = 10;
+            this.btnSimulatorSetAndMove.Text = "SetAndMove";
+            this.btnSimulatorSetAndMove.UseVisualStyleBackColor = true;
+            this.btnSimulatorSetAndMove.Click += new System.EventHandler(this.btnSimulatorSetAndMove_Click);
             // 
-            // textBox1
+            // SetAndMoveTextBox
             // 
             this.SetAndMoveTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.SetAndMoveTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(67)))));
             this.SetAndMoveTextBox.Font = new System.Drawing.Font("新細明體", 10.2F);
             this.SetAndMoveTextBox.ForeColor = System.Drawing.Color.Gray;
             this.SetAndMoveTextBox.Location = new System.Drawing.Point(152, 238);
-            this.SetAndMoveTextBox.Name = "textBox1";
-            this.SetAndMoveTextBox.Text = "操作方式:(X)(Y)";
-            
+            this.SetAndMoveTextBox.Name = "SetAndMoveTextBox";
             this.SetAndMoveTextBox.Size = new System.Drawing.Size(292, 28);
             this.SetAndMoveTextBox.TabIndex = 13;
+            this.SetAndMoveTextBox.Text = "操作方式:(X)(Y)";
             this.SetAndMoveTextBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             this.SetAndMoveTextBox.GotFocus += new System.EventHandler(this.SetAndMoveTextBox_GotFocus);
             this.SetAndMoveTextBox.LostFocus += new System.EventHandler(this.SetAndMoveTextBox_LostFocus);
@@ -349,7 +348,7 @@
 		private System.Windows.Forms.Button btnSimulatorSetLocation;
 		private System.Windows.Forms.ComboBox cbGoalList;
 		private System.Windows.Forms.ComboBox cbMoveTarget;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnSimulatorSetAndMove;
         private System.Windows.Forms.TextBox SetAndMoveTextBox;
     }
 }

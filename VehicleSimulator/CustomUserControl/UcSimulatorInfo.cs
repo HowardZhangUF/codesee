@@ -584,36 +584,123 @@ namespace VehicleSimulator
 
         private void btnSimulatorSetAndMove_Click(object sender, EventArgs e)
         {
-			if(rSimulatorControl!=null)
-            {
-				if(SetAndMoveTextBox!=null)
-                {
-					char[] separator = { '(', ')' };
-					String[] input = SetAndMoveTextBox.Text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+			if (rSimulatorControl != null && SetAndMoveTextBox != null)
+			{
+				/*
+				char[] separator = { '(', ')' };
+				String[] input = SetAndMoveTextBox.Text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+				int inputLength = input.Length;
 
-					Dictionary<String, String> Start= SeperateGoalAndPoint(cbGoalList.Items);
-					Dictionary<String, String> End = SeperateGoalAndPoint(cbMoveTarget.Items);
-					if(input.All(o => Start.ContainsKey(o)))
+				
+				if (input[inputLength - 1] == "Loop")  //是迴圈
+				{
+					int index = 0;
+
+					String[] Newinput = new String[inputLength - 1];
+					for (int i = 0; i < inputLength - 1; i++)
+					{
+							Newinput[i] = input[i];
+					}
+					int NewinputLength = Newinput.Length;
+
+					Dictionary<String, String> StartPoint = SeperateGoalAndPoint(cbGoalList.Items);
+					Dictionary<String, String> EndPoint = SeperateGoalAndPoint(cbMoveTarget.Items);
+
+					
+					foreach (KeyValuePair<String, String> kvp in StartPoint)
+					{
+						Console.WriteLine("StartPoint Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+					}
+					foreach (KeyValuePair<String, String> kvp in EndPoint)
+					{
+						Console.WriteLine("EndPoint Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+					}
+					
+					
+					while (true)
                     {
-						
-						char[] locationseperator = { '(', ')',','};
-						String[] locationSplitString = Start[input[0]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
-
-						rSimulatorInfo.SetLocation(int.Parse(locationSplitString[0]), int.Parse(locationSplitString[1]), int.Parse(locationSplitString[2]));
-						
-						if(input.Length>1)//先暫時 寫兩點
+						if(index== NewinputLength - 1) //結尾迴圈時
                         {
-							var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), input[1]);
+							char[] LocationSeperator = { '(', ')', ',' };
+							String[] StartPointForXYToward = StartPoint[Newinput[index]].Split(LocationSeperator, StringSplitOptions.RemoveEmptyEntries);
+							index = 0;
+							String[] EndPointForXYToward = EndPoint[Newinput[index]].Split(LocationSeperator, StringSplitOptions.RemoveEmptyEntries);
+
+							foreach (var i in StartPointForXYToward)
+							{
+								Console.WriteLine("LocationSplitString1 :{0}", i);
+							}
+							foreach (var i in EndPointForXYToward)
+							{
+								Console.WriteLine("LocationSplitString2  = {0}", i);
+							}
+
+							rSimulatorInfo.SetLocation(int.Parse(StartPointForXYToward[0]), int.Parse(StartPointForXYToward[1]), int.Parse(StartPointForXYToward[2]));
+
+							var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), Newinput[index]);
+							rSimulatorControl.StartMove(input[index], moveRequests);
+						}
+                        else //NO結尾迴圈時
+                        {
+							char[] LocationSeperator = { '(', ')', ',' };
+							String[] StartPointForXYToward = StartPoint[Newinput[index]].Split(LocationSeperator, StringSplitOptions.RemoveEmptyEntries);
+							String[] EndPointForXYToward = EndPoint[Newinput[index + 1]].Split(LocationSeperator, StringSplitOptions.RemoveEmptyEntries);
+
+							foreach (var i in StartPointForXYToward)
+							{
+								Console.WriteLine("LocationSplitString1 :{0}", i);
+							}
+							foreach (var i in EndPointForXYToward)
+							{
+								Console.WriteLine("LocationSplitString2  = {0}", i);
+							}
+
+							rSimulatorInfo.SetLocation(int.Parse(StartPointForXYToward[0]), int.Parse(StartPointForXYToward[1]), int.Parse(StartPointForXYToward[2]));
+
+							var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), Newinput[index+1]);
 							rSimulatorControl.StartMove(input[1], moveRequests);
+
+							index++;
+						}
+					}
+					}
+					else //No迴圈
+					{
+
+					}
+				*/
+
+				/*舊版
+				Dictionary<String, String> FirstPoint= SeperateGoalAndPoint(cbGoalList.Items);
+				Dictionary<String, String> NextPoint = SeperateGoalAndPoint(cbMoveTarget.Items);
+
+				foreach (KeyValuePair<String, String> kvp in FirstPoint)
+				{
+					//textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+					Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+				}
+
+				if (input.All(o => FirstPoint.ContainsKey(o)))
+                {
+					char[] locationseperator = { '(', ')',','};
+					String[] locationSplitString = FirstPoint[input[0]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
+
+					rSimulatorInfo.SetLocation(int.Parse(locationSplitString[0]), int.Parse(locationSplitString[1]), int.Parse(locationSplitString[2]));
+						
+					if(input.Length>1)//先暫時 寫兩點
+                        {
+						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), input[1]);
+						rSimulatorControl.StartMove(input[1], moveRequests);
 
 						}
 
 
-					}
-
-
-
 				}
+				*/
+				
+
+
+				
 				
 			}
         }
