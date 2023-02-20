@@ -200,7 +200,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label lblMapFileFolderDirectory;
+        public System.Windows.Forms.Label lblMapFileFolderDirectory;
         private System.Windows.Forms.Button btnSelectMapFileFolderDirectory;
         private System.Windows.Forms.DataGridView dgvMapFileList;
         private System.Windows.Forms.PictureBox pbMapPreview;
