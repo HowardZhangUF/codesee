@@ -30,6 +30,24 @@ namespace VehicleSimulator
 			}
 		}
 
+		public void SetMapFolder(string MapFolder) //For .txt reading
+		{
+			if (Directory.Exists(MapFolder)) // MapFile真實存在
+			{
+				lblMapFileFolderDirectory.Text = MapFolder;
+                UpdateGui_DgvMapFileList_UpdateMapFileList(MapFolder);
+			}
+
+			/*
+			//預先寫好 有需要可自行更改
+				if (string.IsNullOrEmpty(lblMapFileFolderDirectory.Text) && Directory.Exists(MapFile)) //lblMapFileFolderDirectory是空的  && MapFile真實存在
+				{
+					lblMapFileFolderDirectory.Text= MapFile;
+					UpdateGui_DgvMapFileList_UpdateMapFileList(MapFile);
+				}
+			*/
+		}
+
 		private void UpdateGui_InitializeDgvMapFileList()
         {
             dgvMapFileList.InvokeIfNecessary(() =>
@@ -112,6 +130,7 @@ namespace VehicleSimulator
 				}
 			}
 		}
+		
 		private void dgvMapFileList_SelectionChanged(object sender, EventArgs e)
 		{
 			if (!string.IsNullOrEmpty(lblMapFileFolderDirectory.Text) && dgvMapFileList.CurrentRow.Index >= 0)
