@@ -10,15 +10,20 @@ using System.Windows.Forms;
 using System.IO;
 
 
+
 namespace VehicleSimulator
 {
 	public partial class UcContentOfSimulator : UserControl
 	{
+		
 		private SimulatorProcessContainer rCore = null;
 		private Dictionary<string, UcSimulatorShortcut> mSimulatorShortcutCollection = new Dictionary<string, UcSimulatorShortcut>();
 		private Dictionary<string, UcSimulatorInfo> mSimulatorInfoCollection = new Dictionary<string, UcSimulatorInfo>();
 		private string mCurrentDisplayedSimulatorName = string.Empty;
 		private int mStartIndexOfName = 1;
+
+		
+
 
 		public UcContentOfSimulator()
 		{
@@ -60,90 +65,55 @@ namespace VehicleSimulator
 			}
 
 		}
-		private void btnTxt_Click(object sender, EventArgs e)
+
+		/// <summary>
+		/// 用於新增多台模擬車車輛
+		/// </summary>
+		/// <param name="TotalOfSimulator">模擬車車輛數量</param>
+		public void AddSimulators(int TotalOfSimulator)  //For .txt data reading (in VehicleSimulatorGUI.cs)
 		{
+			string simulatorName;
+			string prefix = "Simulator";
 
-
-			TxtInfo rTxtInfo = new TxtInfo();
-			List<string> ListReadLine = new List<string>(); 
-			string TxtFilePath = rTxtInfo.TxtChoose();
-
-			if (TxtFilePath != null)
+			for (int index = 1; index < (TotalOfSimulator+1); index++)
 			{
-				ListReadLine = rTxtInfo.TxtRead(TxtFilePath);
-				int index = 0;//用於List讀取
-				int i = mStartIndexOfName;//用於車輛創建
-				bool ContinueLoop = true;
-
-				while (ContinueLoop)
-                {
-					var StringReadLine = ListReadLine[index];
-					switch(StringReadLine)
-                    {
-						case "Simulator:": //TO DO:新增車子數量
-							index++;
-							StringReadLine= ListReadLine[index];
-							for(int count=0;count< Convert.ToInt32(StringReadLine); count++)
-                            {
-								string prefix = "Simulator";
-								while (true)
-								{
-									string simulatorName = prefix + i.ToString().PadLeft(3, '0');
-									if (!rCore.IsSimulatorProcessExist(simulatorName))
-									{
-										rCore.AddSimulatorProcess(simulatorName);
-										break;
-									}
-									else
-									{
-										i++;
-									}
-
-								}
-
-
-								if (string.IsNullOrEmpty(mCurrentDisplayedSimulatorName))
-								{
-									UpdateGui_ChangeDisplaySimulator(mSimulatorShortcutCollection.First().Key);
-								}
-
-
-							}
-
-							index++;
-							break;
-
-						case "Next:":  //TO DO:將迴圈座標放進各個車中
-							index++;
-							StringReadLine = ListReadLine[index];
-
-
-							index++;
-							break;
-
-						case "End":
-							ContinueLoop = false;
-
-							break;
-
-						case null:
-							ContinueLoop = false;
-
-							break;
-
-
-                    }
+				while (true)
+				{
+					simulatorName = prefix + index.ToString().PadLeft(3, '0');
+					if (!rCore.IsSimulatorProcessExist(simulatorName))
+					{
+						rCore.AddSimulatorProcess(simulatorName);
+						break;
+					}
+					else
+					{
+						index++;
+					}
 
 				}
-				
 
 
+				if (string.IsNullOrEmpty(mCurrentDisplayedSimulatorName))
+				{
+					UpdateGui_ChangeDisplaySimulator(mSimulatorShortcutCollection.First().Key);
+				}
 
 
-
-            }
-            
+			}
 		}
+
+		/// <summary>
+		/// 用於更改該模擬車SetAndMoveTextBox之Value
+		/// </summary>
+		/// <param name="SimulatorName">模擬車名稱</param>
+		/// <param name="ValueOfSetAndMoveTextBox"></param>
+		public void PushToSetAndMoveTextBox(string SimulatorName,string ValueOfSetAndMoveTextBox)   //For .txt data reading (in VehicleSimulatorGUI.cs)
+		{
+			UpdateGui_ChangeDisplaySimulator(SimulatorName);
+			UpdateGui_ChangeSimulatorInfo(SimulatorName, ValueOfSetAndMoveTextBox);
+		}
+		
+
 
 		private void btnRemoveSimulator_Click(object sender, EventArgs e)
 		{
@@ -183,7 +153,6 @@ namespace VehicleSimulator
 		private void HandleEvent_SimulatorProcessContainerSimulatorAdded(object sender, SimulatorAddedEventArgs e)
 		{
 			string simulatorName = e.SimulatorName;
-
 			UcSimulatorShortcut newShortcut = new UcSimulatorShortcut(e.SimulatorProcess) { Dock = DockStyle.Top, Height = 80 };
 			mSimulatorShortcutCollection.Add(simulatorName, newShortcut);
 			mSimulatorShortcutCollection[simulatorName].Click += HandleEvent_UcSimulatorShortcutClick;
@@ -214,7 +183,7 @@ namespace VehicleSimulator
 			string currentClickedSimulatorName = (sender as UcSimulatorShortcut).GetCurrentSimulatorName();
 			UpdateGui_ChangeDisplaySimulator(currentClickedSimulatorName);
 		}
-		private void UpdateGui_ChangeDisplaySimulator(string SimulatorName)
+		private void UpdateGui_ChangeDisplaySimulator(string SimulatorName) //換車視窗顯示  Ex:Simulator002 視窗 => Simulator001 視窗
 		{
 			if (mCurrentDisplayedSimulatorName != SimulatorName)
 			{
@@ -230,5 +199,21 @@ namespace VehicleSimulator
 				}
 			}
 		}
+		private void UpdateGui_ChangeSimulatorInfo(string SimulatorName,string ValueOfTextBoxChange) //SimulatorName之SetAndMoveTextBox   
+		{
+			if (mCurrentDisplayedSimulatorName != SimulatorName)
+			{
+				mCurrentDisplayedSimulatorName = SimulatorName;
+
+				mSimulatorInfoCollection[mCurrentDisplayedSimulatorName].SetTextBoxValue = ValueOfTextBoxChange;
+			}
+            else
+            {
+				mSimulatorInfoCollection[mCurrentDisplayedSimulatorName].SetTextBoxValue = ValueOfTextBoxChange;
+
+			}
+		}
+
+        
     }
 }
