@@ -32,7 +32,6 @@
             this.btnRemoveSimulator = new System.Windows.Forms.Button();
             this.btnAddSimulator = new System.Windows.Forms.Button();
             this.pnlContent = new System.Windows.Forms.Panel();
-            this.btnTxt = new System.Windows.Forms.Button();
             this.pnlSubMenu.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numStartIndexOfName)).BeginInit();
@@ -51,7 +50,6 @@
             // pnlSubMenu
             // 
             this.pnlSubMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(54)))), ((int)(((byte)(54)))));
-            this.pnlSubMenu.Controls.Add(this.btnTxt);
             this.pnlSubMenu.Controls.Add(this.panel1);
             this.pnlSubMenu.Controls.Add(this.btnRemoveSimulator);
             this.pnlSubMenu.Controls.Add(this.btnAddSimulator);
@@ -133,19 +131,6 @@
             this.pnlContent.Size = new System.Drawing.Size(470, 420);
             this.pnlContent.TabIndex = 0;
             // 
-            // btnTxt
-            // 
-            this.btnTxt.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(41)))), ((int)(((byte)(41)))));
-            this.btnTxt.FlatAppearance.BorderSize = 0;
-            this.btnTxt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTxt.Image = global::VehicleSimulator.Properties.Resources.icons8_folder_24px;
-            this.btnTxt.Location = new System.Drawing.Point(152, 1);
-            this.btnTxt.Name = "btnTxt";
-            this.btnTxt.Size = new System.Drawing.Size(33, 28);
-            this.btnTxt.TabIndex = 3;
-            this.btnTxt.UseVisualStyleBackColor = true;
-            this.btnTxt.Click += new System.EventHandler(this.btnTxt_Click);
-            // 
             // UcContentOfSimulator
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -171,6 +156,5 @@
 		private System.Windows.Forms.Panel pnlContent;
 		private System.Windows.Forms.NumericUpDown numStartIndexOfName;
 		private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button btnTxt;
     }
 }

@@ -105,7 +105,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(447, 400);
             this.tableLayoutPanel1.TabIndex = 1;
-            this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
+            
             // 
             // btnSimulatorSetLocation
             // 
@@ -235,7 +235,6 @@
             this.txtHostIpPort.Name = "txtHostIpPort";
             this.txtHostIpPort.Size = new System.Drawing.Size(292, 28);
             this.txtHostIpPort.TabIndex = 9;
-            this.txtHostIpPort.TextChanged += new System.EventHandler(this.txtHostIpPort_TextChanged);
             // 
             // cbGoalList
             // 
@@ -265,7 +264,7 @@
             this.cbMoveTarget.Name = "cbMoveTarget";
             this.cbMoveTarget.Size = new System.Drawing.Size(290, 28);
             this.cbMoveTarget.TabIndex = 12;
-            this.cbMoveTarget.SelectedIndexChanged += new System.EventHandler(this.cbMoveTarget_SelectedIndexChanged);
+           
             // 
             // btnSimulatorSetAndMove
             // 
@@ -291,8 +290,8 @@
             this.SetAndMoveTextBox.Name = "SetAndMoveTextBox";
             this.SetAndMoveTextBox.Size = new System.Drawing.Size(292, 28);
             this.SetAndMoveTextBox.TabIndex = 13;
-            this.SetAndMoveTextBox.Text = "操作方式:(X)(Y)";
-            this.SetAndMoveTextBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.SetAndMoveTextBox.Text = "(Target)(Target)...(Loop)";
+            
             this.SetAndMoveTextBox.GotFocus += new System.EventHandler(this.SetAndMoveTextBox_GotFocus);
             this.SetAndMoveTextBox.LostFocus += new System.EventHandler(this.SetAndMoveTextBox_LostFocus);
             // 
@@ -313,24 +312,26 @@
 
         }
 
+        
         private void SetAndMoveTextBox_LostFocus(object sender, System.EventArgs e)
         {
             if (string.IsNullOrEmpty(SetAndMoveTextBox.Text))
             {
                 SetAndMoveTextBox.ForeColor = System.Drawing.Color.Gray;
-                SetAndMoveTextBox.Text = "操作方式:(X)(Y)";
+                SetAndMoveTextBox.Text = "(Target)(Target)...(Loop)";
             }
         }
 
         private void SetAndMoveTextBox_GotFocus(object sender, System.EventArgs e)
         {
-            if (SetAndMoveTextBox.Text == "操作方式:(X)(Y)")
+            if (SetAndMoveTextBox.Text == "(Target)(Target)...(Loop)")
             {
                 SetAndMoveTextBox.Clear();
                 SetAndMoveTextBox.ForeColor = System.Drawing.Color.White;
             }
 
         }
+        
 
         #endregion
 

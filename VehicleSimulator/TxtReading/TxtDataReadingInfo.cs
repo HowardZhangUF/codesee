@@ -8,23 +8,23 @@ using System.IO;
 
 namespace VehicleSimulator
 {
-    class TxtInfo:ITxtInfo
+    class TxtDataReadingInfo:ITxtDataReadingInfo
     {
-       public TxtInfo()
+       public TxtDataReadingInfo()
         {
 
         }
 
-        public string TxtChoose()
+        public string TxtDataChoose()
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Multiselect = false;
-            dialog.Title = "請選擇.txt檔";
-            dialog.Filter = "Txt Files(*.txt*)|*.txt*";
+            OpenFileDialog rOpenFileDialog = new OpenFileDialog();
+            rOpenFileDialog.Multiselect = false;
+            rOpenFileDialog.Title = "請選擇.txt檔";
+            rOpenFileDialog.Filter = "Txt Files(*.txt*)|*.txt*";
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (rOpenFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string TxtFilePath = dialog.FileName;
+                string TxtFilePath = rOpenFileDialog.FileName;
 
                 return TxtFilePath;
             }
@@ -33,11 +33,10 @@ namespace VehicleSimulator
                 return null;
             }
         }
-        public List<string> TxtRead(string SimulatorTxtData)
+        public List<string> TxtDataRead(string SimulatorTxtData)
         {
 
 			StreamReader rStreamReader = new StreamReader(SimulatorTxtData);
-			SimulatorProcessContainer rCore = new SimulatorProcessContainer();
             List<string> ListReadLine = new List<string>();
             string ReadLine;
 

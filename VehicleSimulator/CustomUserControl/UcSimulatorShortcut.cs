@@ -12,10 +12,7 @@ namespace VehicleSimulator
 		private ISimulatorControl rSimulatorControl = null;
 		private IHostCommunicator rHostCommunicator = null;
 
-		public UcSimulatorShortcut()
-		{
-			InitializeComponent();
-		}
+		
 		public UcSimulatorShortcut(SimulatorProcess SimulatorProcess)
 		{
 			InitializeComponent();
@@ -128,7 +125,7 @@ namespace VehicleSimulator
 		{
 			UpdateGui_SetSimulatorIsConnect(rHostCommunicator.mIsConnected);
 		}
-		private void UpdateGui_UpdateSimulatorInfo()
+		public void UpdateGui_UpdateSimulatorInfo()
 		{
 			if (rSimulatorProcess != null && rHostCommunicator != null)
 			{

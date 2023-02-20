@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace VehicleSimulator
 {
-    interface ITxtInfo
+    interface ITxtDataReadingInfo
     {
-        string TxtChoose();
-        List<string> TxtRead(string SimulatorTxtData);
+        string TxtDataChoose();
+        List<string> TxtDataRead(string SimulatorTxtData);
     }
 }

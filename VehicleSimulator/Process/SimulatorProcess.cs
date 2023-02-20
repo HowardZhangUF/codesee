@@ -3,6 +3,7 @@ using SerialData;
 using System;
 using System.Threading.Tasks;
 
+
 namespace VehicleSimulator
 {
 	public class SimulatorProcess
@@ -15,6 +16,7 @@ namespace VehicleSimulator
 		private IMoveRequestCalculator mMoveRequestCalculator = null;
 		private IHostMessageHandler mHostMessageHandler = null;
 		private ISimulatorInfoReporter mSimulatorInfoReporter = null;
+		
 
 		public SimulatorProcess(string SimulatorName)
 		{
