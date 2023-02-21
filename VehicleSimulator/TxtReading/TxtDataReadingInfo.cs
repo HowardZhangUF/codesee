@@ -10,15 +10,20 @@ namespace VehicleSimulator
 {
     class TxtDataReadingInfo:ITxtDataReadingInfo
     {
-       public TxtDataReadingInfo()
+        public TxtDataReadingInfo()
         {
 
         }
 
+        /// <summary>
+        /// 獲取文字檔檔案完整路徑
+        /// </summary>
+        /// <returns>若有選取文字檔(文字檔路徑)，若無(null)。</returns>
         public string TxtDataChoose()
         {
             OpenFileDialog rOpenFileDialog = new OpenFileDialog();
-            rOpenFileDialog.Multiselect = false;
+
+            rOpenFileDialog.Multiselect = false; 
             rOpenFileDialog.Title = "請選擇.txt檔";
             rOpenFileDialog.Filter = "Txt Files(*.txt*)|*.txt*";
 
@@ -33,33 +38,39 @@ namespace VehicleSimulator
                 return null;
             }
         }
+
+        /// <summary>
+        /// 讀取文字檔內容
+        /// </summary>
+        /// <param name="SimulatorTxtData">文字檔檔案完整路徑</param>
+        /// <returns>若有內文(回傳其内容)，若路徑不存在(null)</returns>
         public List<string> TxtDataRead(string SimulatorTxtData)
         {
+           
+                StreamReader rStreamReader = new StreamReader(SimulatorTxtData);
+                List<string> ListReadLine = new List<string>();
+                string ReadLine;
 
-			StreamReader rStreamReader = new StreamReader(SimulatorTxtData);
-            List<string> ListReadLine = new List<string>();
-            string ReadLine;
+                do
+                {
+                    ReadLine = rStreamReader.ReadLine();
+                    ListReadLine.Add(ReadLine);
 
-			do
-			{
-				ReadLine = rStreamReader.ReadLine();
-				ListReadLine.Add(ReadLine);
-                
-            }
-			while 
-            (ReadLine != "End" && ReadLine != null);
+                }
+                while
+                (ReadLine != "End" && ReadLine != null);
 
+
+                for (int index = 0; index < ListReadLine.Count; index++)
+                {
+                    Console.WriteLine(ListReadLine[index]);
+                }
+
+
+                rStreamReader.Close();
+
+                return ListReadLine;
             
-            for(int index = 0; index < ListReadLine.Count; index++)
-            {
-                Console.WriteLine(ListReadLine[index]);
-            }
-               
-            
-			rStreamReader.Close();
-
-            return ListReadLine;
-
 		}
     }
 
