@@ -109,6 +109,7 @@ namespace VehicleSimulator
 		/// <param name="ValueOfSetAndMoveTextBox"></param>
 		public void PushToSetAndMoveTextBox(string SimulatorName,string ValueOfSetAndMoveTextBox)   //For .txt data reading (in VehicleSimulatorGUI.cs)
 		{
+			
 			UpdateGui_ChangeDisplaySimulator(SimulatorName);
 			UpdateGui_ChangeSimulatorInfo(SimulatorName, ValueOfSetAndMoveTextBox);
 		}
