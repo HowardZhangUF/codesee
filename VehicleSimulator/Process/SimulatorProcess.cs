@@ -87,6 +87,7 @@ namespace VehicleSimulator
 
 			UnsubscribeEvent(mSimulatorControl);
 			mSimulatorControl = new SimulatorControl(mSimulatorInfo);
+			
 			SubscribeEvent(mSimulatorControl);
 
 			UnsubscribeEvent(mHostCommunicator);
