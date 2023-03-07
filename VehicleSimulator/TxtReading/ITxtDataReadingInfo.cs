@@ -8,7 +8,7 @@ namespace VehicleSimulator
 {
     interface ITxtDataReadingInfo
     {
-        string TxtDataChoose();
-        List<string> TxtDataRead(string SimulatorTxtData);
+        string Choose_Txt_Data_Path();
+        List<string> Read_Txt_Data(string SimulatorTxtData);
     }
 }
