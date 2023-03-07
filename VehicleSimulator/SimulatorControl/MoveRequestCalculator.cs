@@ -17,73 +17,28 @@ namespace VehicleSimulator
 		private IPathFinderUsingAStar mPathFinderUsingAStar = new PathFinderUsingAStar();
 		private IPathOptimizer mPathOptimizer = new PathOptimizer();
 
+		private string mFilePath = null;
+		private int Step_Size = 70;
+
+
+
 		public void SetMap(string FilePath)
 		{
 			if (!File.Exists(FilePath)) return;
-
+			mFilePath = FilePath;
 			mMap = MapFactory.CreateMapUsingQuadTree(EMapFileType.iTS, FilePath);
-			MapFactory.CalculateInfluenceGrid(mMap, 350, 3, 0.2f);
+			MapFactory.CalculateInfluenceGrid(mMap, Step_Size, 3, 0.2f);
 			mPathFinderUsingAStar.Set(mMap);
 			mPathOptimizer.Set(mMap);
 		}
-		public List<MoveRequest> Calculate(Point Start, string TargetName)
-		{
-			if (mMap.mGoals.Any(o => o.mName == TargetName))
-			{
-				var Goal = mMap.mGoals.First(o => o.mName == TargetName);
-				if (IsGoalRequestToward(Goal))
-				{
-					return Calculate(Start, new Point(Goal.mX, Goal.mY), (int)Goal.mToward, IsGoalMoveBackward(Goal));
-				}
-				else
-				{
-					return Calculate(Start, new Point(Goal.mX, Goal.mY), IsGoalMoveBackward(Goal));
-				}
-			}
-			else
-			{
-				return null;
-			}
-		}
-		public List<MoveRequest> Calculate(Point Start, Point End, bool IsMoveBackward = false)
-		{
-			if (mMap == null)
-			{
-				return new List<MoveRequest>() { new MoveRequest(End.mX, End.mY, IsMoveBackward) };
-			}
-			else
-			{
-				mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), 700, 350, out PathFindingResult pathfindingResult, out Module.Pathfinding.Object.Path path);
-				if (path == null)
-				{
-					return null;
-				}
-				else
-				{
-					path = mPathOptimizer.OptimizePath(path, 700);
-					return Convert(path, IsMoveBackward);
-				}
-			}
-		}
-		public List<MoveRequest> Calculate(Point Start, Point End, int EndToward, bool IsMoveBackward = false)
-		{
-			if (mMap == null)
-			{
-				return new List<MoveRequest>() { new MoveRequest(End.mX, End.mY, EndToward, IsMoveBackward) };
-			}
-			else
-			{
-				mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), 700, 350, out PathFindingResult pathfindingResult, out Module.Pathfinding.Object.Path path);
-				if (path == null)
-				{
-					return null;
-				}
-				else
-				{
-					path = mPathOptimizer.OptimizePath(path, 700);
-					return Convert(path, EndToward, IsMoveBackward);
-				}
-			}
+
+		private void SetMap(string FilePath,int Step_Size)
+        {
+			if (!File.Exists(FilePath)) return;
+			mMap = MapFactory.CreateMapUsingQuadTree(EMapFileType.iTS, FilePath);
+			MapFactory.CalculateInfluenceGrid(mMap, Step_Size, 3, 0.2f);
+			mPathFinderUsingAStar.Set(mMap);
+			mPathOptimizer.Set(mMap);
 		}
 
 		public List<MoveRequest> Calculate(Point Start, string TargetName,int Width,int RotationDiameter)
@@ -109,45 +64,54 @@ namespace VehicleSimulator
 		public List<MoveRequest> Calculate(Point Start, Point End, int Width, int RotationDiameter, bool IsMoveBackward = false)
 		{
 			int SizeChoose;
-			if (Width >= RotationDiameter) { SizeChoose=Width; } else { SizeChoose = RotationDiameter; }
+			if (Width >= RotationDiameter) { SizeChoose=Width;SetMap(mFilePath,SizeChoose/10); } else { SizeChoose = RotationDiameter; SetMap(mFilePath, SizeChoose/10); }
 			if (mMap == null)
 			{
 				return new List<MoveRequest>() { new MoveRequest(End.mX, End.mY, IsMoveBackward) };
 			}
 			else
 			{
-				mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose/2, out PathFindingResult pathfindingResult, out Module.Pathfinding.Object.Path path);
-				if (path == null)
+				int count = 1;
+				Module.Pathfinding.Object.Path path = null;
+				PathFindingResult pathfindingResult = PathFindingResult.None;
+
+				do
 				{
-					return null;
-				}
-				else
-				{
-					path = mPathOptimizer.OptimizePath(path, SizeChoose);
-					return Convert(path, IsMoveBackward);
-				}
+					mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose / (count + 1), out pathfindingResult, out path);
+					count++;
+				} while (pathfindingResult != PathFindingResult.PathFound && count < 10);
+				path = mPathOptimizer.OptimizePath(path, SizeChoose);
+				return Convert(path, IsMoveBackward);
 			}
 		}
 		public List<MoveRequest> Calculate(Point Start, Point End, int EndToward,int Width,int RotationDiameter, bool IsMoveBackward = false)
 		{
 			int SizeChoose;
-			if (Width >= RotationDiameter) { SizeChoose = Width; } else { SizeChoose = RotationDiameter; }
+			if (Width >= RotationDiameter) { SizeChoose = Width; SetMap(mFilePath, SizeChoose / 10); } else { SizeChoose = RotationDiameter; SetMap(mFilePath, SizeChoose / 10); }
 			if (mMap == null)
 			{
 				return new List<MoveRequest>() { new MoveRequest(End.mX, End.mY, EndToward, IsMoveBackward) };
 			}
 			else
 			{
-				mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose / 2, out PathFindingResult pathfindingResult, out Module.Pathfinding.Object.Path path);
-				if (path == null)
-				{
-					return null;
-				}
-				else
-				{
-					path = mPathOptimizer.OptimizePath(path, SizeChoose );
-					return Convert(path, EndToward, IsMoveBackward);
-				}
+				int count = 1;
+				Module.Pathfinding.Object.Path path = null;
+				PathFindingResult pathfindingResult = PathFindingResult.None;
+
+
+				do
+                {
+                    mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose / (count + 1), out pathfindingResult, out path);
+                    count++; 
+                } while (pathfindingResult != PathFindingResult.PathFound && count<10);
+
+				
+
+				//mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose / 5, out PathFindingResult pathfindingResult, out path);
+
+				path = mPathOptimizer.OptimizePath(path, SizeChoose );
+				return Convert(path, EndToward, IsMoveBackward);
+				
 			}
 		}
 
