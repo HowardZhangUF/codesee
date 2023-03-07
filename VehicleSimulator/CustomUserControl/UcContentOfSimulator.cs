@@ -15,20 +15,38 @@ namespace VehicleSimulator
 {
 	public partial class UcContentOfSimulator : UserControl
 	{
-		
+
 		private SimulatorProcessContainer rCore = null;
 		private Dictionary<string, UcSimulatorShortcut> mSimulatorShortcutCollection = new Dictionary<string, UcSimulatorShortcut>();
 		private Dictionary<string, UcSimulatorInfo> mSimulatorInfoCollection = new Dictionary<string, UcSimulatorInfo>();
 		private string mCurrentDisplayedSimulatorName = string.Empty;
 		private int mStartIndexOfName = 1;
 
-		
+
 
 
 		public UcContentOfSimulator()
 		{
 			InitializeComponent();
 		}
+
+		public string GetmSimulatorShortcutCollectionFirstKey
+        {
+            get
+            {
+				return mSimulatorShortcutCollection.First().Key;
+			}
+        }
+
+		public List<string> GetSimulatorShortcutCollectionAllKey
+        {
+            get
+            {
+				return mSimulatorShortcutCollection.Keys.ToList();
+				
+			}
+        }
+
 		public void Set(SimulatorProcessContainer SimulatorProcessContainer)
 		{
 			if (SimulatorProcessContainer != null)
@@ -41,6 +59,7 @@ namespace VehicleSimulator
 
 		private void btnAddSimulator_Click(object sender, EventArgs e)
 		{
+			
 			int i = mStartIndexOfName;
 			string prefix = "Simulator";
 			while (true)
@@ -55,14 +74,15 @@ namespace VehicleSimulator
 				{
 					i++;
 				}
-				
+
 			}
-			
+
 
 			if (string.IsNullOrEmpty(mCurrentDisplayedSimulatorName))
 			{
 				UpdateGui_ChangeDisplaySimulator(mSimulatorShortcutCollection.First().Key);
 			}
+
 
 		}
 
@@ -75,7 +95,8 @@ namespace VehicleSimulator
 			string simulatorName;
 			string prefix = "Simulator";
 
-			for (int index = 1; index < (TotalOfSimulator+1); index++)
+			int mEndIndexOfName = mStartIndexOfName + TotalOfSimulator ;
+			for (int index = mStartIndexOfName; index < (mEndIndexOfName); index++)
 			{
 				while (true)
 				{
@@ -106,7 +127,7 @@ namespace VehicleSimulator
 		/// 用於更改該模擬車SetAndMoveTextBox之Value
 		/// </summary>
 		/// <param name="SimulatorName">模擬車名稱</param>
-		/// <param name="ValueOfSetAndMoveTextBox"></param>
+		/// <param name="ValueOfSetAndMoveTextBox">SetAndMoveTextBox之Value</param>
 		public void PushToSetAndMoveTextBox(string SimulatorName,string ValueOfSetAndMoveTextBox)   //For .txt data reading (in VehicleSimulatorGUI.cs)
 		{
 			
@@ -167,6 +188,8 @@ namespace VehicleSimulator
 			UcSimulatorInfo newInfo = new UcSimulatorInfo(e.SimulatorProcess) { Dock = DockStyle.Fill };
 			mSimulatorInfoCollection.Add(simulatorName, newInfo);
 			pnlContent.Controls.Add(mSimulatorInfoCollection[simulatorName]);
+
+			mSimulatorInfoCollection[simulatorName].Dispaly_From_Here_To_There("None", "None");
 		}
 		private void HandleEvent_SimulatorProcessContainerSimulatorRemoved(object sender, SimulatorRemovedEventArgs e)
 		{
@@ -184,7 +207,7 @@ namespace VehicleSimulator
 			string currentClickedSimulatorName = (sender as UcSimulatorShortcut).GetCurrentSimulatorName();
 			UpdateGui_ChangeDisplaySimulator(currentClickedSimulatorName);
 		}
-		private void UpdateGui_ChangeDisplaySimulator(string SimulatorName) //換車視窗顯示  Ex:Simulator002 視窗 => Simulator001 視窗
+		public void UpdateGui_ChangeDisplaySimulator(string SimulatorName) //換車視窗顯示  Ex:Simulator002 視窗 => Simulator001 視窗
 		{
 			if (mCurrentDisplayedSimulatorName != SimulatorName)
 			{
@@ -205,16 +228,44 @@ namespace VehicleSimulator
 			if (mCurrentDisplayedSimulatorName != SimulatorName)
 			{
 				mCurrentDisplayedSimulatorName = SimulatorName;
-
-				mSimulatorInfoCollection[mCurrentDisplayedSimulatorName].SetTextBoxValue = ValueOfTextBoxChange;
+				mSimulatorInfoCollection[mCurrentDisplayedSimulatorName].Set_SetAndMoveTextBoxValue = ValueOfTextBoxChange;
 			}
             else
             {
-				mSimulatorInfoCollection[mCurrentDisplayedSimulatorName].SetTextBoxValue = ValueOfTextBoxChange;
-
+				mSimulatorInfoCollection[mCurrentDisplayedSimulatorName].Set_SetAndMoveTextBoxValue = ValueOfTextBoxChange;
 			}
 		}
+		public void Update_Dictionary(string SimulatorName,string Update_SimulatorName)
+		{
+            Dictionary<string, UcSimulatorShortcut> New_mSimulatorShortcutCollection = new Dictionary<string, UcSimulatorShortcut>();
+            Dictionary<string, UcSimulatorInfo> New_mSimulatorInfoCollection = new Dictionary<string, UcSimulatorInfo>();
 
-        
+			foreach (var i in mSimulatorInfoCollection)
+			{
+				if(i.Key== SimulatorName)
+				{
+					New_mSimulatorInfoCollection.Add(Update_SimulatorName,i.Value);
+				}
+				else
+				{
+                    New_mSimulatorInfoCollection.Add(i.Key, i.Value);
+                }
+			}
+
+            foreach (var i in New_mSimulatorShortcutCollection)
+            {
+                if (i.Key == SimulatorName)
+                {
+                    New_mSimulatorShortcutCollection.Add(Update_SimulatorName, i.Value);
+                }
+                else
+                {
+                    New_mSimulatorShortcutCollection.Add(i.Key, i.Value);
+                }
+            }
+        }
+
+
+
     }
 }
