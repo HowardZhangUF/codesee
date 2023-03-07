@@ -125,33 +125,36 @@ namespace VehicleSimulator
 		}
 
 
-		//.txt檔   文件內文規格說明
-		//
-		//(Simulator:)=創建模擬車數量
-		//(Map:)=載入地圖檔路徑 (功能施工中)
-		//(Next:)=對各別模擬車輸入座標 (可輸出至btnSetAndMove 但無作用)
-		//(End) or null =結束讀取.txt檔
 
 		private void btnMeanOfReadTxtData_Click(object sender, EventArgs e)  //TODO:方法待封裝
 		{
-			TxtDataReadingInfo rTxtDataReadingInfo = new TxtDataReadingInfo();
-			List<string> ListOfReadLine = new List<string>();
-			string TxtFilePath = rTxtDataReadingInfo.TxtDataChoose();
-
-			if (TxtFilePath != null)
+			try
 			{
-				ListOfReadLine = rTxtDataReadingInfo.TxtDataRead(TxtFilePath);
+                TxtDataReadingInfo rTxtDataReadingInfo = new TxtDataReadingInfo();
+                List<string> ListOfReadLine = new List<string>();
+                string TxtFilePath = rTxtDataReadingInfo.Choose_Txt_Data_Path();
+				bool TxtDataCheckingMode = false;//用於確認是否繼續讀取文件內容
 
-				int List_index = 0;             //用於List讀取
-				bool ContinueLoop = true;       //用於是否結束讀取.txt
-				int SimulatorName_index = 1;    //用於寫入SetAndMoveTextBox判斷
-				string simulatorName;
-				string prefix = "Simulator";
+				if (TxtFilePath != null)
+				{
+					ListOfReadLine = rTxtDataReadingInfo.Read_Txt_Data(TxtFilePath);
+					TxtDataCheckingMode = true;
+				}
+
+				int NameList_index = 0;
+                int List_index = 0;//用於List讀取
+				bool SetMapPath = false;
+				String simulatorName;
+
+				var OneLine = ListOfReadLine[List_index];
+				
 				
 
-				while (ContinueLoop)
+
+				while (TxtDataCheckingMode)
 				{
-					var OneLine = ListOfReadLine[List_index];
+					OneLine = ListOfReadLine[List_index];
+
 					switch (OneLine)
 					{
 						case "Simulator:":
@@ -160,6 +163,7 @@ namespace VehicleSimulator
 							OneLine = ListOfReadLine[List_index];
 							int TotalOfSimulator = Convert.ToInt32(OneLine);
 							ucContentOfSimulator1.AddSimulators(TotalOfSimulator);
+							
 							List_index++;
 
 							break;
@@ -169,6 +173,7 @@ namespace VehicleSimulator
 							List_index++;
 							OneLine = ListOfReadLine[List_index];
 							ucContentOfSetting1.SetMapFolder(OneLine);
+							SetMapPath = true;
 							List_index++;
 
 							break;
@@ -177,35 +182,46 @@ namespace VehicleSimulator
 
 							List_index++;
 							OneLine = ListOfReadLine[List_index];
-							simulatorName = null;
-							simulatorName = prefix + SimulatorName_index.ToString().PadLeft(3, '0');
+							var NameList = ucContentOfSimulator1.GetSimulatorShortcutCollectionAllKey;
+							simulatorName =NameList[NameList_index];
 							ucContentOfSimulator1.PushToSetAndMoveTextBox(simulatorName, OneLine);
-							SimulatorName_index++;
+							NameList_index++;
 							List_index++;
 
 							break;
 
 						case "End":
-
-							ContinueLoop = false;
+							TxtDataCheckingMode = false;
 
 							break;
 
 						case null:
-
-							ContinueLoop = false;
+							TxtDataCheckingMode = false;
 
 							break;
 
+						default:
+							MessageBox.Show("請輸入正確的關鍵字以自動建立模擬車");
+							TxtDataCheckingMode = false;
 
+							break;
 					}
-
-
-
 				}
-			}
+
+				if (SetMapPath == false)
+				{
+					string MapPath = System.IO.Path.GetDirectoryName(TxtFilePath);
+					ucContentOfSetting1.SetMapFolder(MapPath);
+				}
+
+				ucContentOfSimulator1.UpdateGui_ChangeDisplaySimulator(ucContentOfSimulator1.GetmSimulatorShortcutCollectionFirstKey);
+            }
+            catch(KeyNotFoundException) {MessageBox.Show("KeyNotFoundException");}
+			catch(Exception Ex)			{ExceptionHandling.HandleException(Ex);}
 		}
 
+		
+		
 		private void SubscribeEvent_SimulatorProcessContainer(SimulatorProcessContainer SimulatorProcessContainer)
 		{
 			if (SimulatorProcessContainer != null)
