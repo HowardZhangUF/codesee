@@ -46,12 +46,13 @@ namespace VehicleSimulator
 		}
 		public void StartMove(string Target, List<MoveRequest> MoveRequests)
 		{
-			try
-			{
+			
 				if (mIsExecuting) return;
 
 				mTarget = Target;
 				mMoveRequests.Clear();
+            if (MoveRequests != null)
+            {
 				mMoveRequests.AddRange(MoveRequests);
 				mPauseMoveFlag = false;
 
@@ -61,10 +62,15 @@ namespace VehicleSimulator
 
 				Start();
 			}
-            catch 
-			{
+            else
+            {
 				MessageBox.Show("NO PATH TO GO");
 			}
+			
+				
+			
+				
+			
 		}
 		public void StopMove()
 		{
