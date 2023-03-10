@@ -33,6 +33,7 @@
             this.btnCloseProgram = new System.Windows.Forms.Button();
             this.pnlStatus = new System.Windows.Forms.Panel();
             this.pnlMenu = new System.Windows.Forms.Panel();
+            this.btnMeanOfReadTxtData = new System.Windows.Forms.Button();
             this.btnMenuOfAbout = new System.Windows.Forms.Button();
             this.btnMenuOfSetting = new System.Windows.Forms.Button();
             this.btnMenuOfConsole = new System.Windows.Forms.Button();
@@ -45,7 +46,6 @@
             this.pnlPaddingLeft = new System.Windows.Forms.Panel();
             this.pnlPaddingRight = new System.Windows.Forms.Panel();
             this.pnlPaddingTop = new System.Windows.Forms.Panel();
-            this.btnMeanOfReadTxtData = new System.Windows.Forms.Button();
             this.pnlTitle.SuspendLayout();
             this.pnlMenu.SuspendLayout();
             this.pnlContent.SuspendLayout();
@@ -139,6 +139,23 @@
             this.pnlMenu.Name = "pnlMenu";
             this.pnlMenu.Size = new System.Drawing.Size(760, 60);
             this.pnlMenu.TabIndex = 2;
+            // 
+            // btnMeanOfReadTxtData
+            // 
+            this.btnMeanOfReadTxtData.Dock = System.Windows.Forms.DockStyle.Left;
+            this.btnMeanOfReadTxtData.FlatAppearance.BorderSize = 0;
+            this.btnMeanOfReadTxtData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMeanOfReadTxtData.ForeColor = System.Drawing.Color.White;
+            this.btnMeanOfReadTxtData.Image = global::VehicleSimulator.Properties.Resources.icons8_folder_24px;
+            this.btnMeanOfReadTxtData.Location = new System.Drawing.Point(340, 0);
+            this.btnMeanOfReadTxtData.Name = "btnMeanOfReadTxtData";
+            this.btnMeanOfReadTxtData.Size = new System.Drawing.Size(85, 60);
+            this.btnMeanOfReadTxtData.TabIndex = 4;
+            this.btnMeanOfReadTxtData.Text = "Read .txt";
+            this.btnMeanOfReadTxtData.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.btnMeanOfReadTxtData.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnMeanOfReadTxtData.UseVisualStyleBackColor = true;
+            this.btnMeanOfReadTxtData.Click += new System.EventHandler(this.btnMeanOfReadTxtData_Click);
             // 
             // btnMenuOfAbout
             // 
@@ -282,23 +299,6 @@
             this.pnlPaddingTop.Name = "pnlPaddingTop";
             this.pnlPaddingTop.Size = new System.Drawing.Size(800, 10);
             this.pnlPaddingTop.TabIndex = 1;
-            // 
-            // btnMeanOfReadTxtData
-            // 
-            this.btnMeanOfReadTxtData.Dock = System.Windows.Forms.DockStyle.Left;
-            this.btnMeanOfReadTxtData.FlatAppearance.BorderSize = 0;
-            this.btnMeanOfReadTxtData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMeanOfReadTxtData.ForeColor = System.Drawing.Color.White;
-            this.btnMeanOfReadTxtData.Image = global::VehicleSimulator.Properties.Resources.icons8_folder_24px;
-            this.btnMeanOfReadTxtData.Location = new System.Drawing.Point(340, 0);
-            this.btnMeanOfReadTxtData.Name = "btnMeanOfReadTxtData";
-            this.btnMeanOfReadTxtData.Size = new System.Drawing.Size(85, 60);
-            this.btnMeanOfReadTxtData.TabIndex = 4;
-            this.btnMeanOfReadTxtData.Text = "Read .txt";
-            this.btnMeanOfReadTxtData.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnMeanOfReadTxtData.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.btnMeanOfReadTxtData.UseVisualStyleBackColor = true;
-            this.btnMeanOfReadTxtData.Click += new System.EventHandler(this.btnMeanOfReadTxtData_Click);
             // 
             // VehicleSimulatorGUI
             // 

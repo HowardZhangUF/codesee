@@ -399,25 +399,29 @@ namespace VehicleSimulator
 					char[] locationseperator = { '(', ')', ',' };
 					String[] Point_X_Y_Toword = GoalInfo[Newinput[index]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
 
+
 					if (index == Newinput.Length - 1)
 					{
-						
+
 						rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
 						index = 0;
-						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), Newinput[index], rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
-						rSimulatorControl.StartMove(Newinput[index], moveRequests);
-
-						Dispaly_From_Here_To_There(Newinput[Newinput.Length - 1]+GoalInfo[Newinput[Newinput.Length - 1]], Newinput[index]+ GoalInfo[Newinput[index]]);
+						Dispaly_From_Here_To_There(Newinput[Newinput.Length - 1] + GoalInfo[Newinput[Newinput.Length - 1]], Newinput[index] + GoalInfo[Newinput[index]]);
+					}
+					else if (index == 0)
+                    {
+						rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
+						index++;
 					}
 					else
 					{
-						rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
 						index++;
+						Dispaly_From_Here_To_There(Newinput[index - 1] + GoalInfo[Newinput[index - 1]], Newinput[index] + GoalInfo[Newinput[index]]);
+					}
 						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), Newinput[index], rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
 						rSimulatorControl.StartMove(Newinput[index], moveRequests);
 
-						Dispaly_From_Here_To_There(Newinput[index - 1]+GoalInfo[Newinput[index - 1]], Newinput[index]+ GoalInfo[Newinput[index]]);
-					}
+						
+					
 
 				}
 				
@@ -446,25 +450,31 @@ namespace VehicleSimulator
 			}
 			while (ContintueWhile)
 			{
+				char[] locationseperator = { '(', ')', ',' };
+				String[] Point_X_Y_Toword = GoalInfo[input[index]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
+
+				if (index == 0)
+                {
+					rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
+				}
+				
+				
 
 				if (rSimulatorInfo.mStatus == ESimulatorStatus.Idle)
 				{
-					char[] locationseperator = { '(', ')', ',' };
-					String[] Point_X_Y_Toword = GoalInfo[input[index]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
-					rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
-					
 					index++;
 					var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), input[index], rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
 					rSimulatorControl.StartMove(input[index], moveRequests);
 
 					Dispaly_From_Here_To_There(input[index-1] + GoalInfo[input[index-1]], input[index] + GoalInfo[input[index]]);
 
+
 					if (index == input.Length - 1)
 					{
 						ContintueWhile = false;
 					}
-
 				}
+				
 				
 			}
 			

@@ -304,11 +304,11 @@
             this.tableLayoutPanel1.SetColumnSpan(this.lbPoints, 10);
             this.lbPoints.Font = new System.Drawing.Font("新細明體", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.lbPoints.ForeColor = System.Drawing.Color.White;
-            this.lbPoints.Location = new System.Drawing.Point(187, 274);
+            this.lbPoints.Location = new System.Drawing.Point(127, 274);
             this.lbPoints.Name = "lbPoints";
-            this.lbPoints.Size = new System.Drawing.Size(73, 28);
+            this.lbPoints.Size = new System.Drawing.Size(192, 28);
             this.lbPoints.TabIndex = 14;
-            this.lbPoints.Text = "None";
+            this.lbPoints.Text = "(Start) =>(End)";
             this.lbPoints.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // UcSimulatorInfo

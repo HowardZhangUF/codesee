@@ -14,8 +14,8 @@ namespace VehicleSimulator
 	{
 		private int Major = 1;
 		private int NewFunction = 1;
-		private int Debug = 2;
-		private int Date = 230306;
+		private int Debug = 3;
+		private int Date = 230310;
 		private string Dot = " . ";
 
 

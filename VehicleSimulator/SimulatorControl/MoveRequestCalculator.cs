@@ -110,7 +110,15 @@ namespace VehicleSimulator
 				//mPathFinderUsingAStar.FindPath(new Module.Map.GeometricShape.Point(Start.mX, Start.mY), new Module.Map.GeometricShape.Point(End.mX, End.mY), SizeChoose, SizeChoose / 5, out PathFindingResult pathfindingResult, out path);
 
 				path = mPathOptimizer.OptimizePath(path, SizeChoose );
-				return Convert(path, EndToward, IsMoveBackward);
+                if (path == null)
+                {
+					return null;
+                }
+                else
+                {
+					return Convert(path, EndToward, IsMoveBackward);
+				}
+				
 				
 			}
 		}
@@ -121,6 +129,7 @@ namespace VehicleSimulator
 		}
 		private List<MoveRequest> Convert(Module.Pathfinding.Object.Path Path, int EndToward, bool IsMoveBackward = false)
 		{
+            
 			List<MoveRequest> result = new List<MoveRequest>();
 			for (int i = 1; i < Path.mPoints.Count - 1; ++i)
 			{
