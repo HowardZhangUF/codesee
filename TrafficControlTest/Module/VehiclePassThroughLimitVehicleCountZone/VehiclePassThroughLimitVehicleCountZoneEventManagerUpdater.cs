@@ -151,26 +151,22 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 					for (int j = 0; j < limitVehicleCountZoneInfos.Count; ++j)
 					{
 						int distance;
+						
 						if(IsQualifiedToAddInLine(vehicleInfos[i],limitVehicleCountZoneInfos[j],limitVehicleCountZoneInfos,out distance))
                         {
-                            if (vehicleInfos[i].mCurrentState == "Pause")
-                                Console.WriteLine($"車輛{vehicleInfos[i].mName},距離{distance},限車區號碼{limitVehicleCountZoneInfos[j].mName}");
-
-                            VehicleAddInLine(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j],distance);
+							VehicleAddInLine(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j],distance);
                         }
-						else
+                        else
                         {
 							VehicleRemoveFromLine(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j]);
                         }
+						                       
 
-						DisConnectedVehicleRemoveFromLine(vehicleInfos,limitVehicleCountZoneInfos[j]);
+                        ReleaseOneCarAndPauseRestofAll(vehicleInfos,limitVehicleCountZoneInfos[j],currentEvents);
 
-						ReleaseOneCarAndPauseRestofAll(vehicleInfos,limitVehicleCountZoneInfos[j],currentEvents);
-						
-						//foreach(var Car in limitVehicleCountZoneInfos[j].mCarInLineOfLimitVehicleCountZone)
-      //                      Console.WriteLine($"車名{Car.Key},距離{Car.Value},限車區號碼{limitVehicleCountZoneInfos[j].mName}");
+                                               
 
-						
+
 						////若限車區 讓車字典含值
 						//if (limitVehicleCountZoneInfos[j].mLetgo.ContainsKey(vehicleInfos[i].mName))
 						//{
@@ -233,39 +229,42 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 					}
 				}
 
-				// 新的事件集合與舊的事件集合比較 (Add, Update Item 判斷)
-				for (int i = 0; i < currentEvents.Count; ++i)
-				{
-					// 如果 Event 已存在，更新之，反之，新增之
-					if (rVehiclePassThroughLimitVehicleCountZoneEventManager.IsExist(currentEvents[i].rVehicleInfo.mName, currentEvents[i].rLimitVehicleCountZoneInfo.mName))
-					{
-						rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateDistance(currentEvents[i].rVehicleInfo.mName, currentEvents[i].rLimitVehicleCountZoneInfo.mName, currentEvents[i].mDistance);
-						rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateState(currentEvents[i].rVehicleInfo.mName, currentEvents[i].rLimitVehicleCountZoneInfo.mName, currentEvents[i].mState);
-					}
-					else
-					{
-						rVehiclePassThroughLimitVehicleCountZoneEventManager.Add(currentEvents[i].mName, currentEvents[i]);
-					}
-				}
+                // 新的事件集合與舊的事件集合比較 (Add, Update Item 判斷=>PauseMoving)
+                for (int i = 0; i < currentEvents.Count; ++i)
+                {
+                    // 如果 Event 已存在，更新之，反之，新增之
+                    if (rVehiclePassThroughLimitVehicleCountZoneEventManager.IsExist(currentEvents[i].rVehicleInfo.mName, currentEvents[i].rLimitVehicleCountZoneInfo.mName))
+                    {
+                        rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateDistance(currentEvents[i].rVehicleInfo.mName, currentEvents[i].rLimitVehicleCountZoneInfo.mName, currentEvents[i].mDistance);
+                        rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateState(currentEvents[i].rVehicleInfo.mName, currentEvents[i].rLimitVehicleCountZoneInfo.mName, currentEvents[i].mState);
+                    }
+                    else
+                    {
+                        rVehiclePassThroughLimitVehicleCountZoneEventManager.Add(currentEvents[i].mName, currentEvents[i]);
+                    }
+                }
 
-				// 舊的事件集合與新的事件集合比較 (Remove Item 判斷)
-				for (int i = 0; i < lastEvents.Count; ++i)
-				{
-					// 如果舊的 Event 在當前事件集合中找不到對應的項目，則代表該 Event 已結束
-					if (!currentEvents.Any(o => o.rVehicleInfo.mName == lastEvents[i].rVehicleInfo.mName && o.rLimitVehicleCountZoneInfo.mName == lastEvents[i].rLimitVehicleCountZoneInfo.mName))
-					{
-						rVehiclePassThroughLimitVehicleCountZoneEventManager.Remove(lastEvents[i].mName);
-					}
-				}
+                // 舊的事件集合與新的事件集合比較 (Remove Item 判斷=>Remove Control amd ResumeMoving)
+                for (int i = 0; i < lastEvents.Count; ++i)
+                {
+                    // 如果舊的 Event 在當前事件集合中找不到對應的項目，則代表該 Event 已結束
+                    if (!currentEvents.Any(o => o.rVehicleInfo.mName == lastEvents[i].rVehicleInfo.mName && o.rLimitVehicleCountZoneInfo.mName == lastEvents[i].rLimitVehicleCountZoneInfo.mName))
+                    {
+						//若該車輛已完全斷線則不執行
+						if(rVehicleInfoManager.IsExist(lastEvents[i].rVehicleInfo.mName))
+							rVehiclePassThroughLimitVehicleCountZoneEventManager.Remove(lastEvents[i].mName);
+                    }
+                }
 
-			}
+            }
 		}
+
 
         /// <summary>判斷該車輛是否具有資格加入該限車區排隊隊伍</summary>		
         private bool IsQualifiedToAddInLine(IVehicleInfo VehicleInfo,ILimitVehicleCountZoneInfo limitVehicleCountZoneInfo,List<ILimitVehicleCountZoneInfo> limitVehicleCountZoneInfos,out int distance)
         {
 			//有資格定義為 車在聯集限車區中或在閾值內 則所有聯集號碼的限車區隊伍均列第一位
-			//               在一般限車區中或在閾值內 則該限車區隊伍列第一位
+			//               在一般限車區中或在距離閾值內 則該限車區隊伍列第一位
 
 			
 
@@ -274,7 +273,6 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 			else
 				distance = GetDistanceBetweenVehicleAndLimitVehicleCountZoneAlongPathLine(VehicleInfo, limitVehicleCountZoneInfo);
 			
-
 			if (distance >=0 && distance < mDistanceThreshold)
 			{
 				return true;
@@ -292,42 +290,66 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 		private void VehicleRemoveFromLine(String VehicleName, ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo)
         {
 			LimitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone.Remove(VehicleName);
+			
         }
-		/// <summary>斷線VM的車輛 移除限車區隊伍</summary>
-		private void DisConnectedVehicleRemoveFromLine(List<IVehicleInfo> vehicleInfos, ILimitVehicleCountZoneInfo limitVehicleCountZoneInfo)
-		{
-			//所有在限車區隊伍的車輛 (可能有包含已經斷線的車輛)
-			List<String> VehiclesInLimitVehcileCountZoneLine = limitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone.Keys.ToList();
-			//現在還連線的所有車輛
-			List<String> CurrentVehicles = vehicleInfos.Select(o => o.mName).ToList();
-			foreach (var vehicleInLimitVehcileCountZoneLine in VehiclesInLimitVehcileCountZoneLine)
-			{
-				if (!CurrentVehicles.Contains(vehicleInLimitVehcileCountZoneLine))
-				{
-					VehicleRemoveFromLine(vehicleInLimitVehcileCountZoneLine, limitVehicleCountZoneInfo);
-				}
-			}
 
-		}
-		/// <summary>每次只釋放一輛車通過限車區 其餘暫停</summary>
-		private void ReleaseOneCarAndPauseRestofAll(List<IVehicleInfo>vehicleInfos,ILimitVehicleCountZoneInfo limitVehicleCountZoneInfo,List<IVehiclePassThroughLimitVehicleCountZoneEvent> currentEvents)
+        /// <summary>每次只釋放一輛車通過限車區 其餘暫停</summary>
+        private void ReleaseOneCarAndPauseRestofAll(List<IVehicleInfo>vehicleInfos,ILimitVehicleCountZoneInfo limitVehicleCountZoneInfo,List<IVehiclePassThroughLimitVehicleCountZoneEvent> currentEvents)
         {
 			Dictionary<string, int> CarInLineOfLimitVehicleCountZone = limitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone;
-			String VehicleCanGo = CarInLineOfLimitVehicleCountZone.Count == 0 ? "" :CarInLineOfLimitVehicleCountZone.First().Key;
+			String VehicleCanGo = ChooseVehicleCanGo(vehicleInfos, CarInLineOfLimitVehicleCountZone);
 
 
 			foreach (var CarToDistance in limitVehicleCountZoneInfo.mCarInLineOfLimitVehicleCountZone)
 			{
 				if (CarToDistance.Key != VehicleCanGo)
-				{
+				{					
 					IVehicleInfo vehicleInfo = vehicleInfos.Find(o => o.mName == CarToDistance.Key);
-					IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfo, limitVehicleCountZoneInfo, CarToDistance.Value);
-					currentEvents.Add(tmp);
-				}
+					if(vehicleInfo!=null && (vehicleInfo.mCurrentState=="Running" || vehicleInfo.mCurrentState=="Pause"))
+                    {
+						IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfo, limitVehicleCountZoneInfo, CarToDistance.Value);
+                        currentEvents.Add(tmp);
+                    }
+                }
 			}
 		}
-		/// <summary>計算指定 IVehicleInfo 是否在指定 ILimitVehicleCountZoneInfo 區域內</summary>
-		private bool IsVehicleInLimitVehicleCountZone(IVehicleInfo VehicleInfo, IRectangle2D LimitVehicleCountZoneRange)
+		/// <summary> 選擇哪台車可以過</summary>
+
+        private string ChooseVehicleCanGo(List<IVehicleInfo> vehicleInfos, Dictionary<string, int> carInLineOfLimitVehicleCountZone)
+        {
+			int CarLineTotal = carInLineOfLimitVehicleCountZone.Count;//正在排隊的車輛總數
+			int CarLineDynamicIndex = 0;//車輛隊伍動態的指標
+			string WantedVehicle = "";
+			for(int CarLineOriginIndex=0;CarLineOriginIndex<CarLineTotal;CarLineOriginIndex++)
+            {
+				IVehicleInfo OptionalVehicle = vehicleInfos.Find(o => o.mName == carInLineOfLimitVehicleCountZone.ElementAt(CarLineDynamicIndex).Key);
+				if (OptionalVehicle == null)//斷線車輛=>將其從限車區隊伍踢除 
+                {
+					carInLineOfLimitVehicleCountZone.Remove(carInLineOfLimitVehicleCountZone.ElementAt(CarLineDynamicIndex).Key);
+				}					
+				else if (OptionalVehicle.mCurrentOriState == "Soul")//幽靈車輛=>繼續往下一個動態車輛隊伍指標
+                {
+					//若幽靈車輛為隊伍首輛(即還沒挑到想要的車輛) 且該車在單車區內
+					if (WantedVehicle=="" && carInLineOfLimitVehicleCountZone.ElementAt(CarLineDynamicIndex).Value==0)
+                    {
+						WantedVehicle = OptionalVehicle.mName;
+                    }
+					CarLineDynamicIndex += 1;
+				}
+				else//上線的車輛=>>繼續往下一個動態車輛隊伍指標
+				{
+					//若為隊伍首輛(即還沒挑到想要的車輛)
+					if (WantedVehicle == "")
+						WantedVehicle = OptionalVehicle.mName;
+					CarLineDynamicIndex += 1;
+				}
+			}
+			return WantedVehicle;
+            
+        }
+
+        /// <summary>計算指定 IVehicleInfo 是否在指定 ILimitVehicleCountZoneInfo 區域內</summary>
+        private bool IsVehicleInLimitVehicleCountZone(IVehicleInfo VehicleInfo, IRectangle2D LimitVehicleCountZoneRange)
 		{
 			List<IPoint2D> VehicleVertices = new List<IPoint2D>();
 			
