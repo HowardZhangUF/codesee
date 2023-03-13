@@ -464,6 +464,7 @@ namespace TrafficControlTest.UserInterface
 						ucLog1.Set(true, true, true, true, true);
 						ucDashboard1.Visible = true;
 						ucSystemStatus1.Visible = true;
+						ucSystemStatus1.btnLockPanel.Enabled = true;
 						ucConsoleLog1.Visible = true;
 						UpdateGui_InitializeMenuState();
 						break;
@@ -485,6 +486,7 @@ namespace TrafficControlTest.UserInterface
 						ucSetting1.Visible = true;
 						ucDashboard1.Visible = true;
 						ucSystemStatus1.Visible = true;
+						ucSystemStatus1.btnLockPanel.Enabled = false;
 						ucConsoleLog1.Visible = true;
 						UpdateGui_InitializeMenuState();
 						break;
