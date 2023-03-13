@@ -30,7 +30,7 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 		public void Set(IVehicleInfo VehicleInfo, ILimitVehicleCountZoneInfo LimitVehicleCountZoneInfo, int Distance)
 		{
 			DateTime tmp = DateTime.Now;
-			mName = $"VehiclePassThroughLimitVehicleCountZoneEvent{tmp.ToString("yyyyMMddHHmmssfff")}";
+			mName = $"VehiclePauseByLimitVehicleCountZone{LimitVehicleCountZoneInfo.mName}/Distance:{Distance}/{tmp.ToString("yyyyMMddHHmmssfff")}";
 			rVehicleInfo = VehicleInfo;
 			rLimitVehicleCountZoneInfo = LimitVehicleCountZoneInfo;
 			mDistance = Distance;
