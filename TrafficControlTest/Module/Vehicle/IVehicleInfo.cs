@@ -82,7 +82,7 @@ namespace TrafficControlTest.Module.Vehicle
 		/// <summary>狀態持續時間</summary>
 		TimeSpan mCurrentStateDuration { get; }
 		/// <summary>當前自走車定義狀態</summary>
-		string mCurrentOriState { get; }
+		string mCurrentOriState { get; set; }
 		/// <summary>上一個自走車定義狀態</summary>
 		string mPreviousOriState { get; }
 		/// <summary>自走車定義狀態持續時間</summary>
