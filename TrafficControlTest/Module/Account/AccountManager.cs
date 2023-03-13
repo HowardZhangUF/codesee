@@ -92,9 +92,9 @@ namespace TrafficControlTest.Module.Account
 		private void InsertDefaultAccountsToDatabaseTable()
 		{
 			List<string> tmp = new List<string>();
-			tmp.Add($"INSERT OR IGNORE INTO {mTableNameOfAccount} VALUES ('CastecSoftware', '{Cryptography.EncryptString("castecsw")}', {(int)AccountRank.Software})");
-			tmp.Add($"INSERT OR IGNORE INTO {mTableNameOfAccount} VALUES ('CastecService', '{Cryptography.EncryptString("castec0")}', {(int)AccountRank.Service})");
-			tmp.Add($"INSERT OR IGNORE INTO {mTableNameOfAccount} VALUES ('Customer', '{Cryptography.EncryptString("customer")}', {(int)AccountRank.Customer})");
+			tmp.Add($"Replace INTO {mTableNameOfAccount} VALUES ('CastecSoftware', '{Cryptography.EncryptString("software")}', {(int)AccountRank.Software})");
+			tmp.Add($"Replace INTO {mTableNameOfAccount} VALUES ('CastecService', '{Cryptography.EncryptString("castec0")}', {(int)AccountRank.Service})");
+			tmp.Add($"Replace INTO {mTableNameOfAccount} VALUES ('Customer', '{Cryptography.EncryptString("customer")}', {(int)AccountRank.Customer})");
 			rDatabaseAdapter.ExecuteNonQueryCommands(tmp);
 		}
 		private void ClearDatabaseTableData(string TableName)
