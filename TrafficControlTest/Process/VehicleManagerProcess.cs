@@ -861,8 +861,8 @@ namespace TrafficControlTest.Process
 				VehicleCommunicator.SystemStatusChanged += HandleEvent_ISystemWithLoopTaskSystemStatusChanged;
 				VehicleCommunicator.SystemInfoReported += HandleEvent_ISystemWithLoopTaskSystemInfoReported;
 				VehicleCommunicator.ConfigUpdated += HandleEvent_ISystemWithConfigConfigUpdated;
-				VehicleCommunicator.LocalListenStateChanged += HandleEvent_VehicleCommunicatorLocalListenStateChagned;
-				VehicleCommunicator.RemoteConnectStateChanged += HandleEvent_VehicleCommunicatorRemoteConnectStateChagned;
+				VehicleCommunicator.LocalListenStateChanged += HandleEvent_VehicleCommunicatorLocalListenStateChanged;
+				VehicleCommunicator.RemoteConnectStateChanged += HandleEvent_VehicleCommunicatorRemoteConnectStateChanged;
 				VehicleCommunicator.SentData += HandleEvent_VehicleCommunicatorSentData;
 				VehicleCommunicator.ReceivedData += HandleEvent_VehicleCommunicatorReceivedData;
 				VehicleCommunicator.SentDataSuccessed += HandleEvent_VehicleCommunicatorSentDataSuccessed;
@@ -876,8 +876,8 @@ namespace TrafficControlTest.Process
 				VehicleCommunicator.SystemStatusChanged -= HandleEvent_ISystemWithLoopTaskSystemStatusChanged;
 				VehicleCommunicator.SystemInfoReported -= HandleEvent_ISystemWithLoopTaskSystemInfoReported;
 				VehicleCommunicator.ConfigUpdated -= HandleEvent_ISystemWithConfigConfigUpdated;
-				VehicleCommunicator.LocalListenStateChanged -= HandleEvent_VehicleCommunicatorLocalListenStateChagned;
-				VehicleCommunicator.RemoteConnectStateChanged -= HandleEvent_VehicleCommunicatorRemoteConnectStateChagned;
+				VehicleCommunicator.LocalListenStateChanged -= HandleEvent_VehicleCommunicatorLocalListenStateChanged;
+				VehicleCommunicator.RemoteConnectStateChanged -= HandleEvent_VehicleCommunicatorRemoteConnectStateChanged;
 				VehicleCommunicator.SentData -= HandleEvent_VehicleCommunicatorSentData;
 				VehicleCommunicator.ReceivedData -= HandleEvent_VehicleCommunicatorReceivedData;
 				VehicleCommunicator.SentDataSuccessed -= HandleEvent_VehicleCommunicatorSentDataSuccessed;
@@ -1703,7 +1703,7 @@ namespace TrafficControlTest.Process
 		}
 		private void HandleEvent_TimeElapseDetectorYearChanged(object Sender, DateTimeChangedEventArgs Args)
 		{
-			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "YearChagned", Args.ToString());
+			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "YearChanged", Args.ToString());
 		}
 		private void HandleEvent_TimeElapseDetectorMonthChanged(object Sender, DateTimeChangedEventArgs Args)
 		{
@@ -1711,45 +1711,54 @@ namespace TrafficControlTest.Process
 		}
 		private void HandleEvent_TimeElapseDetectorDayChanged(object Sender, DateTimeChangedEventArgs Args)
 		{
-			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "DayChagned", Args.ToString());
+			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "DayChanged", Args.ToString());
 		}
 		private void HandleEvent_TimeElapseDetectorHourChanged(object Sender, DateTimeChangedEventArgs Args)
 		{
-			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "HourChagned", Args.ToString());
+			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "HourChanged", Args.ToString());
 		}
 		private void HandleEvent_TimeElapseDetectorMinuteChanged(object Sender, DateTimeChangedEventArgs Args)
 		{
-			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "MinuteChagned", Args.ToString());
+			HandleDebugMessage(Args.OccurTime, "TimeElapseDetector", "MinuteChanged", Args.ToString());
 		}
 		private void HandleEvent_AccessControlUserLogChanged(object Sender, UserLogChangedEventArgs Args)
 		{
 			HandleDebugMessage(Args.OccurTime, "AccessControl", "UserLogChanged", $"Name: {Args.UserName}, Rank: {Args.UserRank.ToString()}, IsLogin: {Args.IsLogin.ToString()}");
 			RaiseEvent_AccessControlUserLogChanged(Args.OccurTime, Args.UserName, Args.UserRank, Args.IsLogin);
 		}
-		private void HandleEvent_VehicleCommunicatorLocalListenStateChagned(object Sender, ListenStateChangedEventArgs Args)
+		private void HandleEvent_VehicleCommunicatorLocalListenStateChanged(object Sender, ListenStateChangedEventArgs Args)
 		{
 			HandleDebugMessage(Args.OccurTime, "VehicleCommunicator", "LocalListenStateChanged", $"Port: {Args.Port}, IsListened: {Args.IsListened.ToString()}");
 		}
-		private void HandleEvent_VehicleCommunicatorRemoteConnectStateChagned(object Sender, ConnectStateChangedEventArgs Args)
+		/// <summary>處理車輛連線事件  分類為每台車的thread</summary>
+		private void HandleEvent_VehicleCommunicatorRemoteConnectStateChanged(object Sender, ConnectStateChangedEventArgs Args)
 		{
-			//若斷線 將車輛保留原狀時間(s)            
+			//若斷線           
 			if (Args.IsConnected == false)
             {
-                Console.WriteLine();
-				
-				int DisConnectedDelay = Int32.Parse(mConfigurator.GetValue("HostCommunicator/DisconnectedPeriod")) * 1000;
-				int count = 0;
-				while(mHostCommunicator.mIsListened && count<DisConnectedDelay)
-                {
-					Thread.Sleep(500);
-					count += 500;
-				}
-				
+                Console.WriteLine($"斷線車輛{mVehicleInfoManager.GetItemByIpPort(Args.IpPort).mName} ipport{Args.IpPort}");
+				VehicleMainTainSoulState(Args.IpPort);			
 			}
 			HandleDebugMessage(Args.OccurTime, "VehicleCommunicator", "RemoteConnectStateChanged", $"IPPort: {Args.IpPort}, IsConnected: {Args.IsConnected.ToString()}");
-
-
 		}
+
+        /// <summary>將車輛保留幽靈狀態的時間(s)</summary>
+        private void VehicleMainTainSoulState(string VehicleIpPort)
+        {
+
+			IVehicleInfo DisConnectedVehicle = mVehicleInfoManager.GetItemByIpPort(VehicleIpPort);
+			//幽魂狀態:車輛斷線 但地圖上的車輛還未消失
+			DisConnectedVehicle.mCurrentOriState = "Soul";
+
+			int DisConnectedDelay = Int32.Parse(mConfigurator.GetValue("HostCommunicator/DisconnectedPeriod")) * 1000;
+			int count = 0;
+			while (mHostCommunicator.mIsListened && count < DisConnectedDelay)
+			{
+				Thread.Sleep(500);
+				count += 500;
+			}
+		}
+       
 		private void HandleEvent_VehicleCommunicatorSentData(object Sender, SentDataEventArgs Args)
 		{
 			HandleDebugMessage(Args.OccurTime, "VehicleCommunicator", "SentData", $"IPPort: {Args.IpPort}, DataType: {Args.Data.ToString()}");
