@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
 
 namespace VehicleSimulator
 {
@@ -44,18 +46,31 @@ namespace VehicleSimulator
 		}
 		public void StartMove(string Target, List<MoveRequest> MoveRequests)
 		{
-			if (mIsExecuting) return;
+			
+				if (mIsExecuting) return;
 
-			mTarget = Target;
-			mMoveRequests.Clear();
-			mMoveRequests.AddRange(MoveRequests);
-			mPauseMoveFlag = false;
+				mTarget = Target;
+				mMoveRequests.Clear();
+            if (MoveRequests != null)
+            {
+				mMoveRequests.AddRange(MoveRequests);
+				mPauseMoveFlag = false;
 
-			rSimulatorInfo.SetStatus(ESimulatorStatus.Working);
-			rSimulatorInfo.SetTarget(mTarget);
-			rSimulatorInfo.SetPath(mMoveRequests.Select(o => new Point(o.mX, o.mY)).ToList());
+				rSimulatorInfo.SetStatus(ESimulatorStatus.Working);
+				rSimulatorInfo.SetTarget(mTarget);
+				rSimulatorInfo.SetPath(mMoveRequests.Select(o => new Point(o.mX, o.mY)).ToList());
 
-			Start();
+				Start();
+			}
+            else
+            {
+				MessageBox.Show("NO PATH TO GO");
+			}
+			
+				
+			
+				
+			
 		}
 		public void StopMove()
 		{

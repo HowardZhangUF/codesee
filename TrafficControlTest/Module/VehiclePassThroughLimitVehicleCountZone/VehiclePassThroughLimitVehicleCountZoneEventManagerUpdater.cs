@@ -12,7 +12,7 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 {
 	public class VehiclePassThroughLimitVehicleCountZoneEventManagerUpdater : SystemWithLoopTask, IVehiclePassThroughLimitVehicleCountZoneEventManagerUpdater
 	{
-		public int mDistanceThreshold { get; private set; } = 2500;
+		public int mDistanceThreshold { get; private set; }
 
 		private IVehiclePassThroughLimitVehicleCountZoneEventManager rVehiclePassThroughLimitVehicleCountZoneEventManager = null;
 		private IVehicleInfoManager rVehicleInfoManager = null;
@@ -150,11 +150,11 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 				{
 					for (int j = 0; j < limitVehicleCountZoneInfos.Count; ++j)
 					{
-						//若限車區 讓車字典含值
-						if (limitVehicleCountZoneInfos[j].mLetgo.ContainsKey(vehicleInfos[i].mName))
-						{
-							limitCountZoneLetgoCleanup(vehicleInfos[i], vehicleInfos[i].mCurrentState, limitVehicleCountZoneInfos, j);
-						}
+						////若限車區 讓車字典含值
+						//if (limitVehicleCountZoneInfos[j].mLetgo.ContainsKey(vehicleInfos[i].mName))
+						//{
+						//	limitCountZoneLetgoCleanup(vehicleInfos[i], vehicleInfos[i].mCurrentState, limitVehicleCountZoneInfos, j);
+						//}
 						// 如果自走車已經走到限車區內
 						if (IsVehicleInLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
 						{
@@ -178,19 +178,19 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 							if (IsVehiclePassThroughLimitVehicleCountZone(vehicleInfos[i], limitVehicleCountZoneInfos[j]))
 							{
 								//自走車 是否為會去Park或Dock的車
-								if(vehicleInfos[i].mCurrentTarget.Contains("Park") || vehicleInfos[i].mCurrentTarget.Contains("Dock"))//主要車 前往park or dock
-								{
-									// 自走車是否會擋到其他不會去Park的車
-									if (IsParkCarWillBlockOtherCarPassLimitZone(vehicleInfos[i], OtherVehicleInfos, limitVehicleCountZoneInfos[j]))
-                                    {
-                                        Console.WriteLine($"停止車輛事件觸發");
-										IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], 0);
-										currentEvents.Add(tmp);
-										rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateState(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j].mName, PassThroughState.WillLetgo);
-									}
+								//if(vehicleInfos[i].mCurrentTarget.Contains("Park") || vehicleInfos[i].mCurrentTarget.Contains("Dock"))//主要車 前往park or dock
+								//{
+								//	// 自走車是否會擋到其他不會去Park的車
+								//	//if (IsParkCarWillBlockOtherCarPassLimitZone(vehicleInfos[i], OtherVehicleInfos, limitVehicleCountZoneInfos[j]))
+        // //                           {
+        // //                               Console.WriteLine($"停止車輛事件觸發");
+								//	//	IVehiclePassThroughLimitVehicleCountZoneEvent tmp = Library.Library.GenerateIVehiclePassThroughLimitVehicleCountZoneEvent(vehicleInfos[i], limitVehicleCountZoneInfos[j], 0);
+								//	//	currentEvents.Add(tmp);
+								//	//	rVehiclePassThroughLimitVehicleCountZoneEventManager.UpdateState(vehicleInfos[i].mName, limitVehicleCountZoneInfos[j].mName, PassThroughState.WillLetgo);
+								//	//}
 									
 									
-								}
+								//}
 
 								// 該限車區為滿的
 								if (IsILimitVehicleCountZoneFull(limitVehicleCountZoneInfos[j]))
@@ -365,7 +365,7 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 
 							//park車與其他車限車區進入點>50 =>判斷為異向
 							//distance 的設定為防止park車太過接近限車區擋到其他車輛(若小於閾值 放行park車)
-							if (GeometryAlgorithm.GetDistance(MainCarEnterpoint, OtherCarEnterpoint)>50 && distance > mDistanceThreshold && distance < 4000)
+							if (GeometryAlgorithm.GetDistance(MainCarEnterpoint, OtherCarEnterpoint)>50 && distance > mDistanceThreshold && distance < 2*mDistanceThreshold)
 							{
 								//Console.WriteLine($"進入條件三:主車{VehicleInfo.mName} 其餘車{car.mName}");
 								//擷取總距離A(主車(park車)目前位置 至 主車(park車)限車區離開點) /車速
@@ -432,7 +432,7 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 							//Console.WriteLine($"車名{VehicleInfo.mName},目前座標{VehicleInfo.mLocationCoordinate},進入點:{MainCarEnterpoint},距離長方形:{distance}");
 							//park車與其他車限車區進入點>50 =>判斷為異向
 							//distance 的設定為防止park車太過接近限車區擋到其他車輛(若小於閾值 放行park車)  
-							if (GeometryAlgorithm.GetDistance(MainCarEnterpoint,OtherCarEnterpoint)>50 && distance>mDistanceThreshold &&distance < 4000)
+							if (GeometryAlgorithm.GetDistance(MainCarEnterpoint,OtherCarEnterpoint)>50 && distance>mDistanceThreshold &&distance < 2*mDistanceThreshold)
 							{
 								//Console.WriteLine($"進入條件三:主車{VehicleInfo.mName} 其餘車{car.mName}");
 								//擷取總距離A(主車(park車)目前位置 至 主車(park車)限車區離開點) /車速

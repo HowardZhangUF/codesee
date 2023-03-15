@@ -10,8 +10,8 @@ namespace VehicleSimulator
 	{
 		void SetMap(string FilePath);
 
-		List<MoveRequest> Calculate(Point Start, string TargetName);
-		List<MoveRequest> Calculate(Point Start, Point End, bool IsMoveBackward = false);
-		List<MoveRequest> Calculate(Point Start, Point End, int EndToward, bool IsMoveBackward = false);
+		List<MoveRequest> Calculate(Point Start, string TargetName,int Width,int RotationDiameter);
+		List<MoveRequest> Calculate(Point Start, Point End, int Width, int RotationDiameter, bool IsMoveBackward = false);
+		List<MoveRequest> Calculate(Point Start, Point End, int EndToward, int Width, int RotationDiameter, bool IsMoveBackward = false);
 	}
 }

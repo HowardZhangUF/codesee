@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Forms;
 using LibraryForVM;
 using System.Collections.Generic;
+using System.Threading;
+
 namespace VehicleSimulator
 {
 	public partial class UcSimulatorInfo : UserControl
@@ -14,17 +16,46 @@ namespace VehicleSimulator
 		private IMoveRequestCalculator rMoveRequestCalculator = null;
 		private IHostCommunicator rHostCommunicator = null;
 
-		public UcSimulatorInfo()
+		private Thread mDoGoalsMoveLoop;
+		private Thread mDoGoalsMove;
+
+		/// <summary>
+		/// 按鈕動作狀態
+		/// </summary>
+		private  enum   ButtonActionStatus
+        {
+			
+			SetLocation,
+			Move,
+			SetAndMove,
+			Stop,
+			
+        }
+
+		/// <summary>
+		/// 設定SetAndMoveTextBox值(白色字)
+		/// </summary>
+		public string Set_SetAndMoveTextBoxValue
 		{
-			InitializeComponent();
-			UpdateGui_InitializeDgvSimulatorInfo();
+			set
+			{
+				SetAndMoveTextBox.ForeColor = Color.White;
+				SetAndMoveTextBox.Text = value;
+			}
+
 		}
+
 		public UcSimulatorInfo(SimulatorProcess SimulatorProcess)
 		{
 			InitializeComponent();
 			UpdateGui_InitializeDgvSimulatorInfo();
 			Set(SimulatorProcess);
+			Set_BottonBackColor((int)ButtonActionStatus.Stop);
 		}
+
+
+		#region --Set Method--
+
 		public void Set(SimulatorProcess SimulatorProcess)
 		{
 			UnsubscribeEvent_SimulatorProcess(rSimulatorProcess);
@@ -32,11 +63,6 @@ namespace VehicleSimulator
 			SubscribeEvent_SimulatorProcess(rSimulatorProcess);
 			UpdateGui_UpdateSimulatorInfo();
 		}
-		public string GetCurrentSimulatorName()
-		{
-			return lblSimulatorName.Text;
-		}
-
 		protected void Set(ISimulatorInfo SimulatorInfo)
 		{
 			UnsubscribeEvent_ISimulatorInfo(rSimulatorInfo);
@@ -62,10 +88,49 @@ namespace VehicleSimulator
 			SubscribeEvent_IHostCommunicator(rHostCommunicator);
 		}
 
+		/// <summary>
+		/// 移動相關之按鈕顏色更換(button:SetLocation、Move、SetAndMove、Stop)
+		/// </summary>
+		private void Set_BottonBackColor(int btnActionStatus)
+		{
+			Color Green = Color.Green;
+			Color _67= Color.FromArgb(67, 67, 67); ;
+			switch (btnActionStatus)
+			{
+				case (int)ButtonActionStatus.SetLocation:
+					btnSimulatorSetLocation.BackColor = Green;
+					btnSimulatorMove.BackColor = _67;
+					btnSimulatorSetAndMove.BackColor = _67;
+					btnSimulatorStop.BackColor = _67;
+					break;
+				case (int)ButtonActionStatus.Move:
+					btnSimulatorSetLocation.BackColor = _67;
+					btnSimulatorMove.BackColor = Green;
+					btnSimulatorSetAndMove.BackColor = _67;
+					btnSimulatorStop.BackColor = _67;
+					break;
+				case (int)ButtonActionStatus.SetAndMove:
+					btnSimulatorSetLocation.BackColor = _67;
+					btnSimulatorMove.BackColor = _67;
+					btnSimulatorSetAndMove.BackColor = Green;
+					btnSimulatorStop.BackColor = _67;
+					break;
+				case (int)ButtonActionStatus.Stop:
+					btnSimulatorSetLocation.BackColor = _67;
+					btnSimulatorMove.BackColor = _67;
+					btnSimulatorSetAndMove.BackColor = _67;
+					btnSimulatorStop.BackColor = Green;
+					break;
+			}
+		}
+		#endregion
+
+		#region --Button Click--
 		private void btnSimulatorConnect_Click(object sender, EventArgs e)
 		{
 			if (rHostCommunicator != null)
 			{
+
 				rHostCommunicator.SetConfig("RemoteIpPort", txtHostIpPort.Text);
 				if (rHostCommunicator.mIsConnected)
 				{
@@ -77,57 +142,383 @@ namespace VehicleSimulator
 				}
 			}
 		}
-		private void btnSimulatorMove_Click(object sender, EventArgs e)
-		{
-			if (rSimulatorControl != null)
-			{
-				if (cbMoveTarget.SelectedItem != null)
-				{
-					string targetString = cbMoveTarget.Text;
-					int firstBracketsIndex = targetString.LastIndexOf('(');
-					int lastBracketsIndex = targetString.LastIndexOf(')');
-					string targetName = targetString.Substring(0, firstBracketsIndex - 1);
-					string locationString = targetString.Substring(firstBracketsIndex + 1, lastBracketsIndex - firstBracketsIndex - 1);
-					string[] locationSplitString = locationString.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-					var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), targetName);
-					rSimulatorControl.StartMove(targetName, moveRequests);
-				}
-				else
-				{
-					string[] tmpStrings = cbMoveTarget.Text.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-					if (tmpStrings.Length == 2)
-					{
-						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(int.Parse(tmpStrings[0]), int.Parse(tmpStrings[1])));
-						rSimulatorControl.StartMove(cbMoveTarget.Text, moveRequests);
-					}
-					else if (tmpStrings.Length == 3)
-					{
-						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(int.Parse(tmpStrings[0]), int.Parse(tmpStrings[1])), int.Parse(tmpStrings[2]));
-						rSimulatorControl.StartMove(cbMoveTarget.Text, moveRequests);
-					}
-				}
-			}
-		}
-		private void btnSimulatorStop_Click(object sender, EventArgs e)
-		{
-			if (rSimulatorControl != null)
-			{
-				rSimulatorControl.StopMove();
-			}
-		}
 		private void btnSimulatorSetLocation_Click(object sender, EventArgs e)
 		{
 			if (cbGoalList.Items.Count > 0 && cbGoalList.SelectedItem != null)
 			{
-				// GoalName (X,Y,Toward)
-				string selectedItemString = cbGoalList.SelectedItem.ToString();
-				int firstBracketsIndex = selectedItemString.LastIndexOf('(');
-				int lastBracketsIndex = selectedItemString.LastIndexOf(')');
-				string locationString = selectedItemString.Substring(firstBracketsIndex + 1, lastBracketsIndex - firstBracketsIndex - 1);
-				string[] locationSplitString = locationString.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-				rSimulatorInfo.SetLocation(int.Parse(locationSplitString[0]), int.Parse(locationSplitString[1]), int.Parse(locationSplitString[2]));
+				StopAllDoGoalsMove();
+
+				string Selected_Item_String = cbGoalList.SelectedItem.ToString();
+				Dictionary<string,string> test = SeperateGoalAndPoint(Selected_Item_String);
+				string[] Point_X_Y_Toward;
+				char[] Separator = { '(', ',', ')' };
+
+				foreach (var i in test)
+                {
+					Point_X_Y_Toward = string_Separator(Separator,i.Value);
+					rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toward[0]), int.Parse(Point_X_Y_Toward[1]), int.Parse(Point_X_Y_Toward[2]));
+					Set_BottonBackColor((int)ButtonActionStatus.SetLocation);
+					Dispaly_From_Here_To_There(Selected_Item_String, "None");
+				}
+				
+
+				
 			}
 		}
+		private void btnSimulatorMove_Click(object sender, EventArgs e)
+		{
+			if (rSimulatorControl != null&&cbMoveTarget.SelectedItem!=null)
+			{
+				if (btnSimulatorSetLocation.BackColor==Color.Green)
+				{
+					StopAllDoGoalsMove();
+
+					
+					string targetName=null;
+					string targetName_X_Y_Toward = null;
+
+					Dictionary<string,string>goalInfo= SeperateGoalAndPoint(cbMoveTarget.Text);
+					foreach (var i in goalInfo)
+					{
+						targetName = i.Key;
+						targetName_X_Y_Toward = i.Value;
+					}
+					var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), targetName, rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
+					string selectedItemString = cbGoalList.SelectedItem.ToString();
+					Dispaly_From_Here_To_There(selectedItemString, targetName + targetName_X_Y_Toward);
+					
+					rSimulatorControl.StartMove(targetName, moveRequests);
+
+					Set_BottonBackColor((int)ButtonActionStatus.Move);
+				}
+				else
+                {
+					StopAllDoGoalsMove();
+
+					int mX=Convert.ToInt32(dgvSimulatorInfo.Rows[1].Cells[1].Value?.ToString());
+					int mY= Convert.ToInt32(dgvSimulatorInfo.Rows[2].Cells[1].Value?.ToString());
+					int mToward= Convert.ToInt32(dgvSimulatorInfo.Rows[3].Cells[1].Value?.ToString());
+					
+					string targetName = null;
+					string targetName_X_Y_Toward = null;
+					Dictionary<string, string> goalInfo = SeperateGoalAndPoint(cbMoveTarget.Text);
+					foreach (var i in goalInfo)
+					{
+						targetName = i.Key;
+						targetName_X_Y_Toward = i.Value;
+					}
+					var moveRequests = rMoveRequestCalculator.Calculate(new Point(mX,mY), targetName, rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
+
+					string StartPoint ="("+ mX + ","+ mY + ","+ mToward + ")";
+					string EndPoint = targetName + targetName_X_Y_Toward;
+					Dispaly_From_Here_To_There(StartPoint, EndPoint);
+
+					rSimulatorControl.StartMove(targetName, moveRequests);
+
+					Set_BottonBackColor((int)ButtonActionStatus.Move);
+				}
+                
+			}
+		}
+		
+		
+		private void btnSimulatorSetAndMove_Click(object sender, EventArgs e)
+		{
+			if (rSimulatorInfo.mMapData != null)
+            {
+				StopAllDoGoalsMove();
+
+				bool IsLoop = false;
+				char[] Separator = { '(', ')' };
+				string input = SetAndMoveTextBox.Text;
+				string[] Newinput = string_Separator(Separator,input);
+				
+				foreach (var v in Newinput)
+				{
+					if (v == "Loop")
+					{
+						IsLoop = true;
+					}
+				}
+				
+				string[] goalStrings = GetMapGoalFromMapData(rSimulatorInfo.mMapData);
+				Dictionary<String, String> GoalInfo = SeperateGoalAndPoint(goalStrings);//ex. key:A---(Goal Name), Valus:(100,100)---(Goal X,Y)
+
+				bool bIsGoalsExist = IsGoalsExist(IsLoop, Newinput, GoalInfo);
+
+				if (IsLoop == true&& bIsGoalsExist == true)
+				{
+					mDoGoalsMoveLoop = new Thread(o => DoGoalsMoveLoop(GoalInfo, Newinput));
+					mDoGoalsMoveLoop.Name = "mDoGoalsMoveLoop";
+					mDoGoalsMoveLoop.IsBackground = true;
+					mDoGoalsMoveLoop.Start();
+					Set_BottonBackColor((int)ButtonActionStatus.SetAndMove);
+				}
+				else if (IsLoop == false && bIsGoalsExist == true)
+				{
+					mDoGoalsMove = new Thread(o => DoGoalsMove(GoalInfo, Newinput));
+					mDoGoalsMove.Name = "mDoGoalsMove";
+					mDoGoalsMove.IsBackground = true;
+					mDoGoalsMove.Start();
+					
+					Set_BottonBackColor((int)ButtonActionStatus.SetAndMove);
+				}
+				else if (bIsGoalsExist == false)
+                {
+					MessageBox.Show("有未知的目標點\r\r解決辦法:\r1.選擇其他.map檔\r2.刪除未知目標點");
+				}
+			}
+		}
+
+
+		private void btnSimulatorStop_Click(object sender, EventArgs e)
+		{
+			if (rSimulatorControl != null)
+			{
+				StopAllDoGoalsMove();
+				Set_BottonBackColor((int)ButtonActionStatus.Stop);
+				Dispaly_From_Here_To_There("None", "None");
+			}
+		}
+		#endregion
+
+		#region  --btnSimulatorSetAndMove_Click Method--
+
+		/// <summary>
+		/// 取得地圖上Goal Names
+		/// </summary>
+		/// <param name="mapData"></param>
+		/// <returns></returns>
+		private string[] GetMapGoalFromMapData(MapData mapData)
+		{
+			return mapData.mGoals.OrderBy(o => o.mName).Select(o => $"{o.mName} ({o.mX},{o.mY},{o.mToward})").ToArray();
+		}
+
+		/// <summary>
+		/// 將目標點名稱與座標點分開
+		/// </summary>
+		private static Dictionary<string, string> SeperateGoalAndPoint(string[] goalString)
+		{
+			Dictionary<string, string> GoalPoint = new Dictionary<string, string>();
+
+			foreach (var goalitem in goalString)
+			{
+				string[] GoalItem = goalitem.ToString().Split(' '); //ex: G1 (5,3,90)
+				GoalPoint[GoalItem[0]] = GoalItem[1];// GoalPoint["G1"]="(5,3,90)"
+			}
+			return GoalPoint;
+		}
+
+		/// <summary>
+		/// 將目標點名稱與座標點分開
+		/// </summary>
+		private static Dictionary<string, string> SeperateGoalAndPoint(string goalString)
+		{
+			Dictionary<string, string> GoalPoint = new Dictionary<string, string>();
+			string[] GoalItem=goalString.ToString().Split(' '); //ex: G1 (5,3,90)
+			GoalPoint[GoalItem[0]] = GoalItem[1];// GoalPoint["G1"]="(5,3,90)"
+			
+			return GoalPoint;
+		}
+
+
+		/// <summary>
+		/// 字元分隔器
+		/// </summary>
+		/// <param name="text">要分離的字串</param>
+		/// <returns>分隔後的字串</returns>
+		private string[] string_Separator(char[] Separator,string text) //ex. (0,0) => 0,0
+        {
+			return	text.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+		}
+
+		
+
+		/// <summary>
+		/// 輸入的點是否與地圖點資訊相同
+		/// </summary>
+		/// <param name="IsLoop">是否為迴圈</param>
+		/// <param name="input">輸入的點名稱</param>
+		/// <param name="GoalInfo">地圖點資訊</param>
+		/// <returns>若相同(true)，不相同(false)</returns>
+		private bool IsGoalsExist(bool IsLoop,string[] input, Dictionary<String, String> GoalInfo)
+        {
+			int inputLength = input.Length;
+			if (IsLoop == true)
+            {
+				string[] Newinput = new string[inputLength - 1];
+				for (int i = 0; i < (inputLength - 1); i++)
+				{
+					Newinput[i] = input[i];
+				}
+				if (Newinput.All(o => GoalInfo.ContainsKey(o)))
+				{
+					return true;
+				}
+                else
+                {
+					return false;
+                }
+			}
+            else
+            {
+				if (input.All(o => GoalInfo.ContainsKey(o)))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		
+		/// <summary>
+		/// 進行多路徑點移動迴圈(2點以上)
+		/// </summary>
+		/// <param name="GoalInfo">地圖上點的相關資料(Key:名稱) (Valus:X軸、Y軸、相位角)</param>
+		/// <param name="EndGoalInfo">地圖上終點的相關資料(Key:名稱) (Valus:X軸、Y軸、相位角)</param>
+		/// <param name="input">想進行迴圈的Goal名稱</param>
+		private void DoGoalsMoveLoop(Dictionary<String, String> GoalInfo, String[] input)
+		{
+			bool ContintueWhile = true;
+			int index = 0;
+			int inputLength = input.Length;
+
+			string[] Newinput = new string[inputLength - 1];
+			for (int i = 0; i < (inputLength - 1); i++)
+			{
+				Newinput[i] = input[i];
+			}
+
+			while (ContintueWhile)
+			{
+
+				if (rSimulatorInfo.mStatus == ESimulatorStatus.Idle)
+				{
+					char[] locationseperator = { '(', ')', ',' };
+					String[] Point_X_Y_Toword = GoalInfo[Newinput[index]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
+
+
+					if (index == Newinput.Length - 1)
+					{
+
+						rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
+						index = 0;
+						Dispaly_From_Here_To_There(Newinput[Newinput.Length - 1] + GoalInfo[Newinput[Newinput.Length - 1]], Newinput[index] + GoalInfo[Newinput[index]]);
+					}
+					else if (index == 0)
+                    {
+						rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
+						index++;
+					}
+					else
+					{
+						index++;
+						Dispaly_From_Here_To_There(Newinput[index - 1] + GoalInfo[Newinput[index - 1]], Newinput[index] + GoalInfo[Newinput[index]]);
+					}
+						var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), Newinput[index], rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
+						rSimulatorControl.StartMove(Newinput[index], moveRequests);
+
+						
+					
+
+				}
+				
+			}
+			
+		}
+
+		/// <summary>
+		/// 設定起點(1點) or 進行路徑點移動(2點以上)
+		/// </summary>
+		/// <param name="GoalInfo">地圖上點的相關資料(Key:名稱) (Valus:X軸、Y軸、相位角)</param>
+		/// <param name="EndGoalInfo">地圖上終點的相關資料(Key:名稱) (Valus:X軸、Y軸、相位角)</param>
+		/// <param name="input">想進行迴圈的Goal名稱</param>
+		private void DoGoalsMove(Dictionary<String, String> GoalInfo, String[] input)
+        {
+			int index = 0;
+			bool ContintueWhile = true;
+			if (input.Length == 1)
+			{
+				ContintueWhile = false;
+				char[] locationseperator = { '(', ')', ',' };
+				String[] Point_X_Y_Toword = GoalInfo[input[index]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
+				rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
+
+				Dispaly_From_Here_To_There(input[index]+ GoalInfo[input[index]], "None");
+			}
+			while (ContintueWhile)
+			{
+				char[] locationseperator = { '(', ')', ',' };
+				String[] Point_X_Y_Toword = GoalInfo[input[index]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
+
+				if (index == 0)
+                {
+					rSimulatorInfo.SetLocation(int.Parse(Point_X_Y_Toword[0]), int.Parse(Point_X_Y_Toword[1]), int.Parse(Point_X_Y_Toword[2]));
+				}
+				
+				
+
+				if (rSimulatorInfo.mStatus == ESimulatorStatus.Idle)
+				{
+					index++;
+					var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), input[index], rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
+					rSimulatorControl.StartMove(input[index], moveRequests);
+
+					Dispaly_From_Here_To_There(input[index-1] + GoalInfo[input[index-1]], input[index] + GoalInfo[input[index]]);
+
+
+					if (index == input.Length - 1)
+					{
+						ContintueWhile = false;
+					}
+				}
+				
+				
+			}
+			
+		}
+
+		/// <summary>
+		/// 結束所有路徑點移動執行緒
+		/// </summary>
+		private void StopAllDoGoalsMove()
+		{
+			rSimulatorControl.StopMove();
+
+			int mX = Convert.ToInt32(dgvSimulatorInfo.Rows[1].Cells[1].Value?.ToString());
+			int mY = Convert.ToInt32(dgvSimulatorInfo.Rows[2].Cells[1].Value?.ToString());
+			int mToward = Convert.ToInt32(dgvSimulatorInfo.Rows[3].Cells[1].Value?.ToString());
+
+			rSimulatorInfo.SetLocation(mX, mY, mToward);
+
+			if (mDoGoalsMoveLoop != null && mDoGoalsMoveLoop.IsAlive)
+			{
+				mDoGoalsMoveLoop.Abort();
+			}
+			if (mDoGoalsMove != null && mDoGoalsMove.IsAlive)
+			{
+				mDoGoalsMove.Abort();
+			}
+		}
+
+		/// <summary>
+		/// 顯示出移動過程中的起點與終點
+		/// </summary>
+		/// <param name="StartPoint">起點</param>
+		/// <param name="EndPoints">終點</param>
+		public void Dispaly_From_Here_To_There(string StartPoint, String EndPoints)
+		{
+			string a = "    =>    ";
+			lbPoints.InvokeIfNecessary(() => { lbPoints.Text = StartPoint + a + EndPoints; });
+		}
+
+
+		#endregion
+
+		#region --dgvSimulatorInfo Changed--
+
 		private void dgvSimulatorInfo_SelectionChanged(object sender, EventArgs e)
 		{
 			if (dgvSimulatorInfo.CurrentCell.ColumnIndex == dgvSimulatorInfo.Columns["ItemKey1"].Index || dgvSimulatorInfo.CurrentCell.ColumnIndex == dgvSimulatorInfo.Columns["ItemKey2"].Index)
@@ -149,10 +540,15 @@ namespace VehicleSimulator
 		}
 		private void dgvSimulatorInfo_CellValueChanged(object sender, DataGridViewCellEventArgs e)
 		{
-			if (string.IsNullOrEmpty(GetCurrentSimulatorName())) return;
+			if (string.IsNullOrEmpty(lblSimulatorName.Text)) return;
 
 			string cellValue = dgvSimulatorInfo.Rows[e.RowIndex].Cells[e.ColumnIndex].Value?.ToString();
-			if (e.RowIndex == 1 && e.ColumnIndex == 1) // X
+
+			if(e.RowIndex == 0 && e.ColumnIndex == 1) //Name
+            {
+
+            }
+			else if (e.RowIndex == 1 && e.ColumnIndex == 1) // X
 			{
 				if (int.TryParse(cellValue, out int newX))
 				{
@@ -229,7 +625,34 @@ namespace VehicleSimulator
 					dgvSimulatorInfo.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = rSimulatorInfo.mRotateVelocity;
 				}
 			}
+			else if (e.RowIndex == 5 && e.ColumnIndex == 1) // Width
+			{
+				if (int.TryParse(cellValue, out int newWidth))
+				{
+					rSimulatorInfo.SetWidth(newWidth);
+				}
+				else
+				{
+					dgvSimulatorInfo.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = rSimulatorInfo.mWidth;
+				}
+			}
+			else if (e.RowIndex == 5 && e.ColumnIndex == 3) // Rotation Diameter
+			{
+				if (int.TryParse(cellValue, out int newRotationDiameter))
+				{
+					rSimulatorInfo.SetRotationDiameter(newRotationDiameter);
+				}
+				else
+				{
+					dgvSimulatorInfo.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = rSimulatorInfo.mRotationDiameter;
+				}
+			}
 		}
+
+		#endregion
+
+		#region --SubscribeEvent & UnsubscribeEvent--
+
 		private void SubscribeEvent_SimulatorProcess(SimulatorProcess rSimulatorProcess)
 		{
 			if (rSimulatorProcess != null)
@@ -303,6 +726,11 @@ namespace VehicleSimulator
 				HostCommunicator.ConnectStateChanged -= HandleEvent_HostCommunicatorConnectStateChanged;
 			}
 		}
+
+		#endregion
+
+		#region --HandleEvent--
+
 		private void HandleEvent_SimulatorInfoStatusUpdated(object sender, StatusUpdatedEventArgs e)
 		{
 			if (e.StatusName.Contains("Status"))
@@ -337,12 +765,25 @@ namespace VehicleSimulator
 			{
 				UpdateGui_SetSimulatorGoalList(rSimulatorInfo.mMapData);
 			}
+			else if (e.StatusName.Contains("Width"))
+			{
+				UpdateGui_SetSimulatorWidth(rSimulatorInfo.mWidth);
+			}
+			else if (e.StatusName.Contains("RotationDiameter"))
+			{
+				UpdateGui_SetSimulatorRotationDiameter(rSimulatorInfo.mRotationDiameter);
+			}
 		}
 		private void HandleEvent_HostCommunicatorConnectStateChanged(object sender, ConnectStateChangedEventArgs e)
 		{
 			UpdateGui_SetSimulatorIsConnect(rHostCommunicator.mIsConnected);
 			UpdateGui_SetSimulatorHostIpPort(rHostCommunicator.GetConfig("RemoteIpPort"));
 		}
+
+		#endregion
+
+		#region --UpdateGUI--
+
 		private void UpdateGui_InitializeDgvSimulatorInfo()
 		{
 			DataGridView dgv = dgvSimulatorInfo;
@@ -390,11 +831,13 @@ namespace VehicleSimulator
 
 			dgv.Rows.Add("Name    ", "", "Status    ", "");
 			dgv.Rows.Add("X    ", "0", "Target    ", "");
-			dgv.Rows.Add("Y    ", "0", "Score    ", "0.00");
-			dgv.Rows.Add("Head    ", "0", "Battery    ", "0.00");
+			dgv.Rows.Add("Y    ", "0", "Score    ", "100.00");
+			dgv.Rows.Add("Head    ", "0", "Battery    ", "100.00");
 			dgv.Rows.Add("TranslateVelocity    ", "800", "RotateVelocity    ", "90");
+			dgv.Rows.Add("Width (mm) ","700","RotationDiameter (mm) ","0");
 			dgv.ClearSelection();
 
+			dgv.Rows[0].Cells[1].ReadOnly = false;
 			dgv.Rows[1].Cells[1].ReadOnly = false;
 			dgv.Rows[2].Cells[1].ReadOnly = false;
 			dgv.Rows[2].Cells[3].ReadOnly = false;
@@ -402,6 +845,8 @@ namespace VehicleSimulator
 			dgv.Rows[3].Cells[3].ReadOnly = false;
 			dgv.Rows[4].Cells[1].ReadOnly = false;
 			dgv.Rows[4].Cells[3].ReadOnly = false;
+			dgv.Rows[5].Cells[1].ReadOnly = false;
+			dgv.Rows[5].Cells[3].ReadOnly = false;
 		}
 		private void UpdateGui_UpdateSimulatorInfo()
 		{
@@ -418,6 +863,8 @@ namespace VehicleSimulator
 				UpdateGui_SetSimulatorIsConnect(rHostCommunicator.mIsConnected);
 				UpdateGui_SetSimulatorHostIpPort(rHostCommunicator.GetConfig("RemoteIpPort"));
 				UpdateGui_SetSimulatorGoalList(rSimulatorInfo.mMapData);
+				UpdateGui_SetSimulatorWidth(rSimulatorInfo.mWidth);
+				UpdateGui_SetSimulatorRotationDiameter(rSimulatorInfo.mRotationDiameter);
 			}
 			else
 			{
@@ -432,6 +879,8 @@ namespace VehicleSimulator
 				UpdateGui_SetSimulatorIsConnect(default(bool));
 				UpdateGui_SetSimulatorHostIpPort(string.Empty);
 				UpdateGui_SetSimulatorGoalList(null);
+				UpdateGui_SetSimulatorWidth(default(int));
+				UpdateGui_SetSimulatorRotationDiameter(default(int));
 			}
 		}
 		private void UpdateGui_SetSimulatorName(string Value)
@@ -502,79 +951,21 @@ namespace VehicleSimulator
 				});
 				if (MapData.mGoals != null && MapData.mGoals.Count > 0)
 				{
-					string[] goalStrings = MapData.mGoals.OrderBy(o => o.mName).Select(o => $"{o.mName} ({o.mX},{o.mY},{o.mToward})").ToArray();
+					string[] goalStrings = GetMapGoalFromMapData(MapData);
 					cbMoveTarget.InvokeIfNecessary(() => { cbMoveTarget.Items.AddRange(goalStrings); });
 					cbGoalList.InvokeIfNecessary(() => { cbGoalList.Items.AddRange(goalStrings); });
 				}
 			}
 		}
-
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void cbMoveTarget_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-			
-
+		private void UpdateGui_SetSimulatorWidth(int Value)
+		{
+			dgvSimulatorInfo.InvokeIfNecessary(() => { dgvSimulatorInfo.Rows[5].Cells[1].Value = Value; });
 		}
-		/// <summary>將 目標點的名字 與其座標分開</summary>
-		private static Dictionary<string,string>SeperateGoalAndPoint(ComboBox.ObjectCollection GoalList)
-        {
-			Dictionary<String, String>  GoalPoint = new Dictionary<string, string>();
-			foreach(var goalitem in GoalList)
-            {
-				String[] GoalItem = goalitem.ToString().Split(' '); //ex: G1 (5,3,90)
-				GoalPoint[GoalItem[0]] = GoalItem[1];// GoalPoint["G1"]="(5,3,90)"
-            }
-			return GoalPoint;
-        }
+		private void UpdateGui_SetSimulatorRotationDiameter(int Value)
+		{
+			dgvSimulatorInfo.InvokeIfNecessary(() => { dgvSimulatorInfo.Rows[5].Cells[3].Value = Value; });
+		}
 
-        private void btnSimulatorSetAndMove_Click(object sender, EventArgs e)
-        {
-			if(rSimulatorControl!=null)
-            {
-				if(SetAndMoveTextBox!=null)
-                {
-					char[] separator = { '(', ')' };
-					String[] input = SetAndMoveTextBox.Text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
-					Dictionary<String, String> Start= SeperateGoalAndPoint(cbGoalList.Items);
-					Dictionary<String, String> End = SeperateGoalAndPoint(cbMoveTarget.Items);
-					if(input.All(o => Start.ContainsKey(o)))
-                    {
-						
-						char[] locationseperator = { '(', ')',','};
-						String[] locationSplitString = Start[input[0]].Split(locationseperator, StringSplitOptions.RemoveEmptyEntries);
-
-						rSimulatorInfo.SetLocation(int.Parse(locationSplitString[0]), int.Parse(locationSplitString[1]), int.Parse(locationSplitString[2]));
-						
-						if(input.Length>1)//先暫時 寫兩點
-                        {
-							var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), input[1]);
-							rSimulatorControl.StartMove(input[1], moveRequests);
-
-						}
-
-
-					}
-
-
-
-				}
-				
-			}
-        }
-
-        private void txtHostIpPort_TextChanged(object sender, EventArgs e)
-        {
-
-        }
+        #endregion
     }
 }

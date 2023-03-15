@@ -409,7 +409,7 @@ namespace TrafficControlTest.Module.Configure
 				"DisconnectedPeriod",
 				ConfigurationType.Int,
 				ConfigurationLevel.Normal,
-				"600",
+				"90",
 				"0",
 				"1800",
 				"After the network is disconnected, the retention time of the car.",

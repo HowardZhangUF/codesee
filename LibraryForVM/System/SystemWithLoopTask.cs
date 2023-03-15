@@ -97,6 +97,7 @@ namespace LibraryForVM
 		{
 			mThdLoopExitFlag = new bool[] { false };
 			mThdLoop = new Thread(() => LoopTask(mThdLoopExitFlag));
+			mThdLoop.Name= "mThdLoop";
 			mThdLoop.IsBackground = true;
 			mThdLoop.Start();
 		}

@@ -139,7 +139,7 @@ namespace VehicleSimulator
 		{
 			if (!rSimulatorControl.mIsExecuting)
 			{
-				var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), GoTo.Require);
+				var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), GoTo.Require,rSimulatorInfo.mWidth,rSimulatorInfo.mRotationDiameter);
 				rSimulatorControl.StartMove(GoTo.Require, moveRequests);
 			}
 		}
@@ -147,7 +147,7 @@ namespace VehicleSimulator
 		{
 			if (!rSimulatorControl.mIsExecuting)
 			{
-				var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(GoToPoint.Require[0], GoToPoint.Require[1]));
+				var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(GoToPoint.Require[0], GoToPoint.Require[1]),rSimulatorInfo.mWidth,rSimulatorInfo.mRotationDiameter);
 				rSimulatorControl.StartMove(GoToPoint.Require[0], GoToPoint.Require[1]);
 			}
 		}
@@ -155,7 +155,7 @@ namespace VehicleSimulator
 		{
 			if (!rSimulatorControl.mIsExecuting)
 			{
-				var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(GoToTowardPoint.Require[0], GoToTowardPoint.Require[1]), GoToTowardPoint.Require[2]);
+				var moveRequests = rMoveRequestCalculator.Calculate(new Point(rSimulatorInfo.mX, rSimulatorInfo.mY), new Point(GoToTowardPoint.Require[0], GoToTowardPoint.Require[1]), GoToTowardPoint.Require[2],rSimulatorInfo.mWidth, rSimulatorInfo.mRotationDiameter);
 				rSimulatorControl.StartMove(GoToTowardPoint.Require[0], GoToTowardPoint.Require[1], GoToTowardPoint.Require[2]);
 			}
 		}

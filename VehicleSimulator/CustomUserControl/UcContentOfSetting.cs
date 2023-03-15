@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using LibraryForVM;
@@ -28,6 +25,19 @@ namespace VehicleSimulator
 			{
 				rCore = SimulatorProcessContainer;
 			}
+		}
+
+		public void SetMapFolder(string MapFolder) //For .txt reading
+		{
+			if (Directory.Exists(MapFolder)) 
+			{
+				lblMapFileFolderDirectory.Text = MapFolder;
+                UpdateGui_DgvMapFileList_UpdateMapFileList(MapFolder);
+			}
+            else
+            {
+				MessageBox.Show(" Map Folder Is Not Exists. ");
+            } 
 		}
 
 		private void UpdateGui_InitializeDgvMapFileList()
@@ -86,7 +96,7 @@ namespace VehicleSimulator
 			pbMapPreview.Image = GenerateLoadingImage(pbMapPreview.Width, pbMapPreview.Height);
 			Application.DoEvents();
 
-			if (GetMapDataFromMapFile(MapFilePath, out mMapData))
+			if (Get_MapData_From_MapFile(MapFilePath, out mMapData))
 			{
 				pbMapPreview.Image = GenerateMapImage(pbMapPreview.Width, pbMapPreview.Height, mMapData);
 			}
@@ -100,6 +110,7 @@ namespace VehicleSimulator
 				{					
 					fbd.SelectedPath = lblMapFileFolderDirectory.Text;
 				}
+
 				DialogResult result = fbd.ShowDialog();
 
 				if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
@@ -112,6 +123,7 @@ namespace VehicleSimulator
 				}
 			}
 		}
+		
 		private void dgvMapFileList_SelectionChanged(object sender, EventArgs e)
 		{
 			if (!string.IsNullOrEmpty(lblMapFileFolderDirectory.Text) && dgvMapFileList.CurrentRow.Index >= 0)
@@ -132,7 +144,7 @@ namespace VehicleSimulator
 			}
 		}
 
-		private static bool GetMapDataFromMapFile(string MapFilePath, out MapData MapData)
+		private static bool Get_MapData_From_MapFile(string MapFilePath, out MapData MapData)
 		{
 			MapData = new MapData();
 
@@ -226,6 +238,8 @@ namespace VehicleSimulator
 				return false;
 			}
 		}
+
+
 		private static Image GenerateMapImage(int CanvasWidth, int CanvasHeight, MapData MapData)
 		{
 			Color colorOfBackground = Color.FromArgb(15, 15, 15);

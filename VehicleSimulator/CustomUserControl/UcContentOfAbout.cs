@@ -12,8 +12,30 @@ namespace VehicleSimulator
 {
 	public partial class UcContentOfAbout : UserControl
 	{
+		private int Major = 1;
+		private int NewFunction = 1;
+		private int Debug = 3;
+		private int Date = 230310;
+		private string Dot = " . ";
+
+
 		public UcContentOfAbout() {
 			InitializeComponent();
+			lbVersionNumber.Text = ShowVersionNumber(Major, NewFunction, Debug, Date);
 		}
+
+		/// <summary>
+		/// 合併所有版本號資訊並轉成字串
+		/// </summary>
+		/// <param name="Major">主版本號</param>
+		/// <param name="NewFunction">新增新功能次數</param>
+		/// <param name="Debug">修改錯誤次數</param>
+		/// <param name="Date">日期:YY/MM/DD</param>
+		/// <returns>完整版本號</returns>
+		private string ShowVersionNumber(int Major,int NewFunction,int Debug,int Date)
+        { 
+			return (Convert.ToString(Major) + Dot+ Convert.ToString(NewFunction) + Dot + Convert.ToString(Debug) + Dot + Convert.ToString(Date));
+        }
+
 	}
 }

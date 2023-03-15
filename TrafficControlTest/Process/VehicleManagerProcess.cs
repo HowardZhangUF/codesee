@@ -23,6 +23,7 @@ using TrafficControlTest.Module.Vehicle;
 using TrafficControlTest.Module.VehiclePassThroughAutomaticDoor;
 using TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone;
 using static TrafficControlTest.Library.Library;
+using System.Threading;
 
 namespace TrafficControlTest.Process
 {
@@ -1731,14 +1732,23 @@ namespace TrafficControlTest.Process
 		}
 		private void HandleEvent_VehicleCommunicatorRemoteConnectStateChagned(object Sender, ConnectStateChangedEventArgs Args)
 		{
-			//若斷線 將車輛保留原狀時間(s)
+			//若斷線 將車輛保留原狀時間(s)            
 			if (Args.IsConnected == false)
             {
-				int DisconnectedDelay = Int32.Parse(mConfigurator.GetValue("HostCommunicator/DisconnectedPeriod"))*1000;
-				System.Threading.Thread.Sleep(DisconnectedDelay);
-			}
+                Console.WriteLine();
 				
+				int DisConnectedDelay = Int32.Parse(mConfigurator.GetValue("HostCommunicator/DisconnectedPeriod")) * 1000;
+				int count = 0;
+				while(mHostCommunicator.mIsListened && count<DisConnectedDelay)
+                {
+					Thread.Sleep(500);
+					count += 500;
+				}
+				
+			}
 			HandleDebugMessage(Args.OccurTime, "VehicleCommunicator", "RemoteConnectStateChanged", $"IPPort: {Args.IpPort}, IsConnected: {Args.IsConnected.ToString()}");
+
+
 		}
 		private void HandleEvent_VehicleCommunicatorSentData(object Sender, SentDataEventArgs Args)
 		{

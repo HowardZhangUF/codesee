@@ -20,20 +20,33 @@ namespace VehicleSimulator
 			InitializeComponent();
 			UpdateGui_InitializeDgvConsole();
 		}
+
+		/// <summary>
+		/// 新增Log
+		/// </summary>
 		public void AddLog(string Timestamp, string Log)
 		{
 			UpdateGui_AddRow(Timestamp, Log);
 			UpdateGui_AdjustRowCount(mMaxRowCount);
 		}
+
+		/// <summary>
+		/// 清除Log
+		/// </summary>
 		public void ClearLog()
 		{
 			UpdateGui_ClearRow();
 		}
 
+		/// <summary>
+		/// 滑鼠右鍵Clear
+		/// </summary>
 		private void menuItemClearDgvConsole_Click(object sender, EventArgs e)
 		{
 			UpdateGui_ClearRow();
 		}
+
+
 		private void UpdateGui_InitializeDgvConsole()
 		{
 			DataGridView dgv = dgvConsole;
@@ -76,6 +89,10 @@ namespace VehicleSimulator
 				column.ReadOnly = true;
 			}
 		}
+
+		/// <summary>
+		/// 新增一筆Log資料
+		/// </summary>
 		private void UpdateGui_AddRow(params string[] RowData)
 		{
 			dgvConsole.InvokeIfNecessary(() =>
@@ -83,6 +100,10 @@ namespace VehicleSimulator
 				dgvConsole.Rows.Add(RowData);
 			});
 		}
+
+		/// <summary>
+		/// 刪除當前所有Log資料
+		/// </summary>
 		private void UpdateGui_RemoveRow(int RowIndex)
 		{
 			dgvConsole.InvokeIfNecessary(() =>
@@ -93,6 +114,10 @@ namespace VehicleSimulator
 				}
 			});
 		}
+
+		/// <summary>
+		/// 刪除當前所有Log資料
+		/// </summary>
 		private void UpdateGui_ClearRow()
 		{
 			dgvConsole.InvokeIfNecessary(() =>
@@ -103,6 +128,11 @@ namespace VehicleSimulator
 				}
 			});
 		}
+
+		/// <summary>
+		/// 刪除多筆所有Log資料
+		/// </summary>
+		/// <param name="Maximum">刪除數量</param>
 		private void UpdateGui_AdjustRowCount(int Maximum)
 		{
 			dgvConsole.InvokeIfNecessary(() =>

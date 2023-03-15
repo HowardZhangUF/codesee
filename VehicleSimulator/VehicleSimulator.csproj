@@ -137,6 +137,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TxtReading\TxtDataReadingInfo.cs" />
+    <Compile Include="TxtReading\ITxtDataReadingInfo.cs" />
     <EmbeddedResource Include="CustomUserControl\UcContentOfAbout.resx">
       <DependentUpon>UcContentOfAbout.cs</DependentUpon>
     </EmbeddedResource>

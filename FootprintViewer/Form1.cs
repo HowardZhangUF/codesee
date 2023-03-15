@@ -10,13 +10,18 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+
 
 namespace FootprintViewer
 {
 	public partial class Form1 : Form
 	{
+		
+
 		private DateTime mStartTimestamp { get; set; } = DateTime.MinValue;
 		private DateTime mEndTimestamp { get; set; } = DateTime.MinValue;
 		private DateTime mCurrentTimestamp { get; set; } = DateTime.MinValue;
@@ -58,8 +63,6 @@ namespace FootprintViewer
 				InitializeTimeComboBox(cbEnd);
 				InitializeCbLogTableName();
 				InitializeDgvLogTable();
-
-				//ReadData("D:\\做完就刪\\20220102 2F Wifi 訊號測試\\CASTEC_Log_VM_20220105\\Database\\Event.db", DateTime.Now.AddDays(-7), DateTime.Now.AddDays(-6));
 			}
 			catch (Exception ex)
 			{
@@ -200,11 +203,16 @@ namespace FootprintViewer
 		}
 		private void tbTimestamp_ValueChanged(object sender, EventArgs e)
 		{
+			
 			try
 			{
 				if (mHistoryVehicleInfos.Count == 0) return;
 
-				mCurrentTimestamp = mStartTimestamp.AddSeconds(mEndTimestamp.Subtract(mStartTimestamp).TotalSeconds / (tbTimestamp.Maximum - tbTimestamp.Minimum) * tbTimestamp.Value);
+				//Senconds_perValue : tbTimestamp每格代表幾秒
+				//目前預設tbTimestamp全長3600(寫死 之後要改成可更改)
+				double Senconds_perValue = (mEndTimestamp.Subtract(mStartTimestamp).TotalSeconds / (tbTimestamp.Maximum - tbTimestamp.Minimum))* tbTimestamp.Value;
+				mCurrentTimestamp = mStartTimestamp.AddSeconds(Senconds_perValue);
+
 				lblCurrentTimestamp.Text = mCurrentTimestamp.ToString("yyyy/MM/dd HH:mm:ss");
 				RefreshGui();
 			}
@@ -212,6 +220,7 @@ namespace FootprintViewer
 			{
 				RecordLogMessage(rtxtLog, ex.ToString());
 			}
+			
 		}
 		private void btnLoadLogTable_Click(object sender, EventArgs e)
 		{
@@ -511,8 +520,10 @@ namespace FootprintViewer
 		private void RefreshGui()
 		{
 			// 根據 CurrentTimestamp 更新地圖上的自走車位置
-			lblCurrentTimestamp.Text = mCurrentTimestamp.ToString("yyyy/MM/dd HH:mm:ss");
-
+			lblCurrentTimestamp.InvokeIfNecessary(() =>
+			{
+				lblCurrentTimestamp.Text = mCurrentTimestamp.ToString("yyyy/MM/dd HH:mm:ss");
+			});
 			foreach (var a in mHistoryVehicleInfos)
 			{
 				for (int i = a.Value.Count - 1; i >= 0; i--)
@@ -665,9 +676,65 @@ namespace FootprintViewer
 			}
 			return result.ToArray();
 		}
-	}
 
-	public class HistoryVehicleInfo
+		private Thread AutoDisplay_HistoryInfo;
+		ManualResetEvent _pauseEvent;
+
+
+		private void btnPlayHistoryvideo_Click(object sender, EventArgs e)
+        {
+            if (AutoDisplay_HistoryInfo == null)
+            {
+				
+				_pauseEvent = new ManualResetEvent(true);
+				AutoDisplay_HistoryInfo = new Thread(() =>
+				{
+					while (true)
+					{
+						
+						_pauseEvent.WaitOne(Timeout.Infinite);
+
+						ttt();
+
+						Thread.Sleep(200);
+					}
+
+				});
+				AutoDisplay_HistoryInfo.Name = "test";
+				AutoDisplay_HistoryInfo.IsBackground = true;
+				AutoDisplay_HistoryInfo.Start();
+			}
+            else
+            {
+				_pauseEvent.Set();
+			}
+		}
+
+		private void ttt()
+        {
+            if (mCurrentTimestamp != mEndTimestamp)
+            {
+				
+				mCurrentTimestamp = mCurrentTimestamp.AddSeconds(1);
+				tbTimestamp.InvokeIfNecessary(()=> { tbTimestamp.Value += 1; });
+				RefreshGui();
+			}
+		}
+
+        private void btnPauseHistoryvideo_Click(object sender, EventArgs e)
+        {
+			_pauseEvent.Reset();
+		}
+
+        
+    }
+
+
+
+
+
+
+    public class HistoryVehicleInfo
 	{
 		public DateTime Timestamp { get; private set; } = DateTime.MinValue;
 		public DateTime LastUpdate { get; private set; } = DateTime.MinValue;
