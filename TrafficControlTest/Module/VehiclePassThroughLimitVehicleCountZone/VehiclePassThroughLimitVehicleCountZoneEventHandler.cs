@@ -115,10 +115,16 @@ namespace TrafficControlTest.Module.VehiclePassThroughLimitVehicleCountZone
 		{
 			if (VehiclePassThroughLimitVehicleCountZoneEvent != null)
 			{
-				IVehicleControl control = Library.Library.GenerateIVehicleControl(VehiclePassThroughLimitVehicleCountZoneEvent.rVehicleInfo.mName, Command.PauseMoving, null, VehiclePassThroughLimitVehicleCountZoneEvent.mName, VehiclePassThroughLimitVehicleCountZoneEvent.ToString());
-				if (!IsIVehicleControlAlreadyExistedInManager(control)) // 避免重複丟相同的干預
+				IVehicleInfo Vehicle = VehiclePassThroughLimitVehicleCountZoneEvent.rVehicleInfo;
+				IVehicleControl PauseMovingControl = Library.Library.GenerateIVehicleControl(Vehicle.mName, Command.PauseMoving, null, VehiclePassThroughLimitVehicleCountZoneEvent.mName, VehiclePassThroughLimitVehicleCountZoneEvent.ToString());
+				IVehicleControl VehiclePastResumeMoving = (rVehicleControlManager.GetItems().ToList().Find(o => o.mVehicleId == Vehicle.mName && o.mCommand.ToString() == "ResumeMoving"));
+				if(VehiclePastResumeMoving!=null)
+                {
+					rVehicleControlManager.Remove(VehiclePastResumeMoving.mName);
+                }
+				if (!IsIVehicleControlAlreadyExistedInManager(PauseMovingControl)) // 避免重複丟相同的干預
 				{
-					rVehicleControlManager.Add(control.mName, control);
+					rVehicleControlManager.Add(PauseMovingControl.mName, PauseMovingControl);
 				}
 			}
 		}

@@ -87,6 +87,8 @@
 			this.pnlBtm.SuspendLayout();
 			this.pnlBtmSide.SuspendLayout();
 			this.SuspendLayout();
+			this.KeyPreview = true;
+			this.KeyDown += this.ucSetting1.OnKeyDown;
 			// 
 			// pnlTopSide
 			// 

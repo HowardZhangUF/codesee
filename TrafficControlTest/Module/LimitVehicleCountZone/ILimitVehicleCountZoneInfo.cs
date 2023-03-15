@@ -19,7 +19,8 @@ namespace TrafficControlTest.Module.LimitVehicleCountZone
 		DateTime mLastUpdated { get; }
 
 		Dictionary<string,string> mLetgo { get; set; }
-
+		/// <summary> key:車名 value:與 限車區的距離 </summary>
+		Dictionary<string,int> mCarInLineOfLimitVehicleCountZone { get; set; }
 		void Set(string Name, IRectangle2D Range, int MaxVehicleCount, bool IsUnioned, int UnionId);
 		void UpdateCurrentVehicleNameList(List<Tuple<string, DateTime>> CurrentVehicleNameList);
 		bool ContainsVehicle(string VehicleName);

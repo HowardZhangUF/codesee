@@ -172,7 +172,7 @@
 		}
 
 		#endregion
-		private System.Windows.Forms.Button btnLockPanel;
+		public System.Windows.Forms.Button btnLockPanel;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		private System.Windows.Forms.Button btnExportLog;
 		private System.Windows.Forms.TableLayoutPanel tlpSystem;

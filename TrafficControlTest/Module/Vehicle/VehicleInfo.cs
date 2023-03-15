@@ -38,7 +38,7 @@ namespace TrafficControlTest.Module.Vehicle
 		public string mCurrentState { get; private set; } = string.Empty;
 		public string mPreviousState { get; private set; } = string.Empty;
 		public TimeSpan mCurrentStateDuration { get { return DateTime.Now.Subtract(mStateStartTimestamp); } }
-		public string mCurrentOriState { get; private set; } = string.Empty;
+		public string mCurrentOriState { get;  set; } = string.Empty;
 		public string mPreviousOriState { get; private set; } = string.Empty;
 		public TimeSpan mCurrentOriStateDuration { get { return DateTime.Now.Subtract(mOriStateStartTimestamp); } }
 		public IPoint2D mLocationCoordinate { get; private set; } = new Point2D(0, 0);
@@ -128,7 +128,7 @@ namespace TrafficControlTest.Module.Vehicle
 
 		private List<string> mUpdatedItems = new List<string>();
 		private bool mIsUpdating = false;
-		public Dictionary<string, string> mLetgo { get; set; } = new Dictionary<string, string>(); 
+		
 		public VehicleInfo(string Name)
 		{
 			Set(Name);

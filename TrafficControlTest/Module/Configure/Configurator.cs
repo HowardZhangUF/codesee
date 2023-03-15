@@ -278,7 +278,7 @@ namespace TrafficControlTest.Module.Configure
 				ConfigurationLevel.Normal,
 				"30",
 				"0",
-				"100",
+				"101",
 				"Detecting collision event when vehicle's location score in percentage is greater than or equal to this threshold",
 				"當自走車的定位分數 (%) 高於等於此閾值時才會對其偵測會車事件",
 				"当自走车的定位分数 (%) 高于等于此阈值时才会对其侦测会车事件"
@@ -714,9 +714,13 @@ namespace TrafficControlTest.Module.Configure
 			switch (rProjectType)
 			{
 				case ProjectType.E2029_ThinFlex:
+					mConfigs["HostCommunicator/DisconnectedPeriod"].SetValue("10");
 					mConfigs["MissionDispatcher/DispatchRule"].SetValue("1");
 					mConfigs["MissionDispatcher/IdlePeriodThreshold"].SetValue("5000");
 					mConfigs["VehiclePassThroughAutomaticDoorEventManagerUpdater/CloseDoorDistance"].SetValue("1000");
+					mConfigs["MapManagerUpdater/Region000Activate"].SetValue("True");
+					mConfigs["VehiclePassThroughLimitVehicleCountZoneEventManagerUpdater/DistanceThreshold"].SetValue("1000");
+					
 					break;
 				case ProjectType.E2113_Unimicron:
 					mConfigs["LogRecorder/TimePeriod"].SetValue("500");

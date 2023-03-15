@@ -82,7 +82,7 @@ namespace TrafficControlTest.Module.Vehicle
 		/// <summary>狀態持續時間</summary>
 		TimeSpan mCurrentStateDuration { get; }
 		/// <summary>當前自走車定義狀態</summary>
-		string mCurrentOriState { get; }
+		string mCurrentOriState { get; set; }
 		/// <summary>上一個自走車定義狀態</summary>
 		string mPreviousOriState { get; }
 		/// <summary>自走車定義狀態持續時間</summary>
@@ -119,7 +119,7 @@ namespace TrafficControlTest.Module.Vehicle
 		string mPathString { get; }
 		/// <summary>雷射資料</summary>
 		IList<IPoint2D> mLaserData { get; }
-		Dictionary<string,string> mLetgo { get; set; }
+
 		#endregion
 
 		#region 自定義動態屬性
