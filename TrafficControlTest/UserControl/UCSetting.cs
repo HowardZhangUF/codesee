@@ -526,11 +526,11 @@ namespace TrafficControlTest.UserControl
 
         }
 
+ 
         private void UcSetting_Load(object sender, EventArgs e)
         {
 
         }
-
         private void cmenuItemDeleteRegion_Click(object sender, EventArgs e)
         {
 			try
@@ -566,5 +566,17 @@ namespace TrafficControlTest.UserControl
         {
 
         }
-    }
+
+
+		public void OnKeyDown(object sender,KeyEventArgs e)
+        {
+			var Controls = (ContainerControl)sender;
+			if(Controls.ActiveControl.Text=="  Setting")
+            {
+				//MessageBox.Show($"Hi");可以秀出應該有的資料
+			}
+			
+		}
+		
+	}
 }
