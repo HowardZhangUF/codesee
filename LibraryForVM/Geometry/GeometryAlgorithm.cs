@@ -35,6 +35,7 @@ namespace LibraryForVM
 		public static IEnumerable<IPoint2D> GetIntersectionPoint(IRectangle2D Rectangle, IPoint2D Point1, IPoint2D Point2)
 		{
 			List<IPoint2D> result = null;
+			
 			if (Rectangle != null && Point1 != null && Point2 != null)
 			{
 				result = new List<IPoint2D>();
@@ -248,6 +249,9 @@ namespace LibraryForVM
 				{
 					result = (int)GetDistance(Point, intersectionPoints.ElementAt(0));
 				}
+				Point2D point = new Point2D(2, 5);
+				Rectangle2D rectangle2D = new Rectangle2D(new Point2D(2, 5), new Point2D(3, 6));
+				
 			}
 			return result;
 		}

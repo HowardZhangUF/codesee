@@ -478,7 +478,7 @@ namespace TrafficControlTest.Module.Vehicle
 				}
 			}
 
-			// 在解析自走車資料時，齊資料都是從 Queue 中拿出收到的資料並更新此 VehicleInfo ，
+			// 在解析自走車資料時，其資料都是從 Queue 中拿出收到的資料並更新此 VehicleInfo ，
 			// 但是更新的時間點並非是實際收到資料的時間點，所以在使用時間來計算速度/速率時，基本上都會有誤差
 			// 加上，自走車不動時，定位仍會有些許飄動，導致座標飄動，而也有可能因此誤判自走車開始移動/旋轉，所以暫時將 IsTranslating/IsRotating 的功能關閉。
 			//if (mRecordOfLocationCoordinate.Count > 1)
@@ -1204,7 +1204,8 @@ namespace TrafficControlTest.Module.Vehicle
 			var timeDiff = Current.mTimestamp.Subtract(Previous.mTimestamp).TotalSeconds;
 			var distanceDiff = CalculateDistance(Previous.mCoordinate, Current.mCoordinate);
 			return distanceDiff / timeDiff;
-		}
+			
+				}
 		private double CalculateDistance(IPoint2D Point1, IPoint2D Point2)
 		{
 			return CalculateDistance(Point1.mX, Point1.mY, Point2.mX, Point2.mY);

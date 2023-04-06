@@ -18,6 +18,7 @@ namespace LibraryForVM
 		public DateTime OccurTime { get; private set; }
 		public string ItemName { get; private set; }
 		public string StatusName { get; private set; }
+		
 
 		public StatusUpdatedEventArgs(DateTime OccurTime, string ItemName, string StatusName) : base()
 		{

@@ -7,6 +7,7 @@ namespace LibraryForVM
 	{
 		public int mX { get; set; } = 0;
 		public int mY { get; set; } = 0;
+		
 
 		public Point2D(int X, int Y)
 		{

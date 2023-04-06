@@ -602,6 +602,7 @@ namespace TrafficControlTest.Module.InterveneCommand
 		{
 			return VehicleInfo.mCurrentState == "Idle" && Math.Abs(VehicleInfo.mLocationCoordinate.mX - X) < mToleranceOfXOfArrivedTarget && Math.Abs(VehicleInfo.mLocationCoordinate.mY - Y) < mToleranceOfYOfArrivedTarget;
 		}
+
 		private bool IsVehicleArrived(IVehicleInfo VehicleInfo, int X, int Y, int Toward)
 		{
 			int diffX = Math.Abs(VehicleInfo.mLocationCoordinate.mX - X);

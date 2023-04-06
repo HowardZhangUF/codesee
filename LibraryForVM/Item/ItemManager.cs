@@ -23,6 +23,7 @@ namespace LibraryForVM
 		public bool IsExist(string ItemName)
 		{
 			return mItems.Keys.Contains(ItemName);
+			
 		}
 		public T GetItem(string ItemName)
 		{

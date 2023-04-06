@@ -11,6 +11,7 @@ namespace LibraryForVM
         public event EventHandler<ConnectStateChangedEventArgs> ConnectStateChanged;
         public event EventHandler<SentDataEventArgs> SentData;
         public event EventHandler<ReceivedDataEventArgs> ReceivedData;
+        public event EventHandler<MCSData> McsData;
 
         public string mRemoteIpPort { get; private set; } = "127.0.0.1:1025";
         public bool mIsConnected { get { return mSerialClient.ConnectStatus == EConnectStatus.Connect ? true : false; } }
@@ -58,6 +59,7 @@ namespace LibraryForVM
             {
                 if (Data is Serializable)
                 {
+                    Console.WriteLine($"序列化:{Data}");
                     mSerialClient.Send(Data as Serializable);
                     RaiseEvent_SentData(mRemoteIpPort, Data);
                 }
@@ -67,6 +69,8 @@ namespace LibraryForVM
 		{
 			return new string[] { "TimePeriod", "RemoteIpPort" };
 		}
+        
+
 		public override string GetConfig(string ConfigName)
         {
             switch (ConfigName)
@@ -99,7 +103,8 @@ namespace LibraryForVM
 		{
 			return $"RemoteIPPort: {mRemoteIpPort}, IsConnected: {mIsConnected.ToString()}, CountOfReceivedSerialData: {mSerialClientReceivedSerialDataEventArgs.Count}";
 		}
-		public override void Task()
+       
+        public override void Task()
         {
             Subtask_HandleSerialClientReceivedSerialDataEvents();
         }
