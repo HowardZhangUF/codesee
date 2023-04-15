@@ -241,6 +241,7 @@
     <Compile Include="Module\Map\MapManagerUpdater.cs" />
     <Compile Include="Module\Map\MapRegionSetting.cs" />
     <Compile Include="Module\Mission\AbortMissionAnalyzer.cs" />
+    <Compile Include="Module\Mission\CarDetectMissionAnalyzer.cs" />
     <Compile Include="Module\Mission\DockMissionAnalyzer.cs" />
     <Compile Include="Module\Mission\GotoMissionAnalyzer.cs" />
     <Compile Include="Module\Mission\GotoPointMissionAnalyzer.cs" />

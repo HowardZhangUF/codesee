@@ -50,7 +50,8 @@ namespace TrafficControlTest.Library
 		Goto,
 		GotoPoint,
 		Dock,
-		Abort
+		Abort,
+		CarDetect
 	}
 
 	public enum SignificantEventCategory

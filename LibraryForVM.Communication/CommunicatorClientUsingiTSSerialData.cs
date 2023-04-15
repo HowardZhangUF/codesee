@@ -11,7 +11,7 @@ namespace LibraryForVM
         public event EventHandler<ConnectStateChangedEventArgs> ConnectStateChanged;
         public event EventHandler<SentDataEventArgs> SentData;
         public event EventHandler<ReceivedDataEventArgs> ReceivedData;
-        public event EventHandler<MCSData> McsData;
+        
 
         public string mRemoteIpPort { get; private set; } = "127.0.0.1:1025";
         public bool mIsConnected { get { return mSerialClient.ConnectStatus == EConnectStatus.Connect ? true : false; } }
