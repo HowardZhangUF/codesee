@@ -116,7 +116,7 @@ namespace TrafficControlTest.Module.Mission
                         if (!rMissionStateManager.GetItems().Any(o => AreTheyHaveSameContent(o, missionState)))
                         {
                             replyMsg += $"Reply=CommandAccepted MissionID={missionState.GetMissionId()}";
-                            rHostCommunicator.SendData(Args.IpPort, replyMsg);
+                            rHostCommunicator.SendData(Args.IpPort, replyMsg);//+"\r\n"
                             rMissionStateManager.Add(missionState.mName, missionState);
                         }
                         else
@@ -127,7 +127,7 @@ namespace TrafficControlTest.Module.Mission
                     }
 					else
                     {
-                        replyMsg += $"Reply=CommandAccepted MissionID={missionState.GetMissionId()}";
+                         replyMsg += $"Reply=CommandAccepted MissionID={missionState.GetMissionId()}";
                         rHostCommunicator.SendData(Args.IpPort, replyMsg);
                         rMissionStateManager.Add(missionState.mName, missionState);
                     }
