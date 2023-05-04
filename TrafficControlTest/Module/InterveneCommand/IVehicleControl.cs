@@ -42,6 +42,7 @@ namespace TrafficControlTest.Module.InterveneCommand
 		GotoTowardPoint,    // Normal 讓自走車做一件事，自走車 Idle 時可以下
 		Stop,               // Immediately 切換自走車狀態，自走車 Running/PathNotFound/ObstacleExist/BumperTrigger 時可以下，當自走車已經在執行其他的 Control 時可以下
 		Charge,             // Normal 讓自走車做一件事，自走車 Idle 時可以下
+		CarDetect,          // Immediately 切換自走車狀態，自走車 Running 時可以下，當自走車已經在執行其他的 Control 時可以下
 		Uncharge,           // Normal 讓自走車做一件事，自走車 Charge/ChargeIdle 時可以下
 		Stay,               // System 讓自走車保持當前狀態，並不要執行其他 Control (不會對自走車下指令，而是讓系統知道不要下 Control 給該車) (執行中會保持 Executing 的狀態，直到收到 Unstay 的 Control 則會變成 ExecuteSuccessed)
 		Unstay,				// System 讓自走車恢復成可工作狀態 (不會對自走車下指令，而是讓系統知道不要下 Control 給該車) (執行完就會變成 ExecuteSuccessed)

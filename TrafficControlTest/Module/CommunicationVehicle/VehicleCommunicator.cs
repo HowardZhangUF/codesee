@@ -43,7 +43,11 @@ namespace TrafficControlTest.Module.CommunicationVehicle
 		{
 			SendDataAndWaitAck(IpPort, new Charge(string.Empty));
 		}
-		public void SendDataOfUncharge(string IpPort)
+        public void SendDataOfCarDetect(string IpPort, int X, int Y)
+        {
+            SendDataAndWaitAck(IpPort, new CarDetect(new List<int> { X, Y }));
+        }
+        public void SendDataOfUncharge(string IpPort)
 		{
 			SendDataAndWaitAck(IpPort, new Uncharge(null));
 		}

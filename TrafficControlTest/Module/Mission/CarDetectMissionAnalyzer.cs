@@ -8,7 +8,7 @@ namespace TrafficControlTest.Module.Mission
 	{
 		public static CarDetectMissionAnalyzer mInstance = new CarDetectMissionAnalyzer();
 		public override MissionType mMissionType { get; } = MissionType.CarDetect;
-		protected override string[] mNecessaryItem { get; } = new string[] { "InitPos", "Goal" };
+		protected override string[] mNecessaryItem { get; } = new string[] { "X", "Y" };
 		protected override string[] mOptionalItem { get; } = new string[] { "Head", "MissionID", "VehicleID", "Priority" };
 
 		protected CarDetectMissionAnalyzer() : base() { }

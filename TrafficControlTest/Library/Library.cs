@@ -228,6 +228,9 @@ namespace TrafficControlTest.Library
 				case MissionType.Abort:
 					result = AbortMissionAnalyzer.mInstance;
 					break;
+				case MissionType.CarDetect:
+					result = CarDetectMissionAnalyzer.mInstance;
+					break;
 				default:
 					break;
 			}
@@ -235,7 +238,7 @@ namespace TrafficControlTest.Library
 		}
 		public static IMissionAnalyzer[] GetMissionAnalyzers()
 		{
-			return new IMissionAnalyzer[] { DockMissionAnalyzer.mInstance, GotoPointMissionAnalyzer.mInstance, GotoMissionAnalyzer.mInstance, AbortMissionAnalyzer.mInstance };
+			return new IMissionAnalyzer[] { DockMissionAnalyzer.mInstance, GotoPointMissionAnalyzer.mInstance, GotoMissionAnalyzer.mInstance, AbortMissionAnalyzer.mInstance, CarDetectMissionAnalyzer.mInstance };
 		}
 		public static IHostCommunicator GenerateIHostCommunicator()
 		{

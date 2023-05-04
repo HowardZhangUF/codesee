@@ -147,6 +147,9 @@ namespace TrafficControlTest.Module.InterveneCommand
 					case Command.Charge:
 						HandleVehicleControlOfCharge(VehicleControl, vehicleInfo);
 						break;
+                    case Command.CarDetect:
+						HandleVehicleControlOfCarDetect(VehicleControl, vehicleInfo);
+						break;
 					case Command.Uncharge:
 						HandleVehicleControlOfUncharge(VehicleControl, vehicleInfo);
 						break;
@@ -241,6 +244,16 @@ namespace TrafficControlTest.Module.InterveneCommand
 			{
 				VehicleControl.UpdateSendState(SendState.Sending);
 				rVehicleCommunicator.SendDataOfCharge(VehicleInfo.mIpPort);
+			}
+		}
+		private void HandleVehicleControlOfCarDetect(IVehicleControl VehicleControl, IVehicleInfo VehicleInfo)
+		{
+			if (VehicleInfo == null) return;
+
+			if (VehicleInfo.mCurrentState == "Running" || (VehicleInfo.mCurrentState == "Idle" || VehicleInfo.mCurrentState == "ChargeIdle"))
+			{
+				VehicleControl.UpdateSendState(SendState.Sending);
+				rVehicleCommunicator.SendDataOfCarDetect(VehicleInfo.mIpPort, int.Parse(VehicleControl.mParameters[0]), int.Parse(VehicleControl.mParameters[1]));
 			}
 		}
 		private void HandleVehicleControlOfUncharge(IVehicleControl VehicleControl, IVehicleInfo VehicleInfo)
