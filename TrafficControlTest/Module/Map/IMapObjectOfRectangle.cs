@@ -26,6 +26,7 @@ namespace TrafficControlTest.Module.Map
 		Oneway,
 		SingleVehicle,
 		PathPlanning,
-		AutomaticDoor
+		AutomaticDoor,
+		DetectedCar//為了地圖上出現其他廠商的AGV而新增的成員
 	}
 }

@@ -250,7 +250,7 @@ namespace TrafficControlTest.Module.InterveneCommand
 		{
 			if (VehicleInfo == null) return;
 
-			if (VehicleInfo.mCurrentState == "Running" || (VehicleInfo.mCurrentState == "Idle" || VehicleInfo.mCurrentState == "ChargeIdle"))
+			if (VehicleInfo.mCurrentState == "Running" || VehicleInfo.mCurrentState == "Idle" || VehicleInfo.mCurrentState == "ChargeIdle" || VehicleInfo.mCurrentState == "Pause" || VehicleInfo.mCurrentState == "Charge" || VehicleInfo.mCurrentState == "Alarm")
 			{
 				VehicleControl.UpdateSendState(SendState.Sending);
 				rVehicleCommunicator.SendDataOfCarDetect(VehicleInfo.mIpPort, int.Parse(VehicleControl.mParameters[0]), int.Parse(VehicleControl.mParameters[1]));
@@ -292,9 +292,10 @@ namespace TrafficControlTest.Module.InterveneCommand
 
 			if (IsVehicleExecutingNormalControl(VehicleInfo, rVehicleControlManager))
 			{
-				IVehicleControl correspondingNormalControl = rVehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleInfo.mName).First(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge) && (o.mSendState == SendState.Sending || o.mExecuteState == ExecuteState.Executing));
+				IVehicleControl correspondingNormalControl = rVehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleInfo.mName).First(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge || o.mCommand == Command.CarDetect) && (o.mSendState == SendState.Sending || o.mExecuteState == ExecuteState.Executing));
 				correspondingNormalControl.UpdateExecuteState(ExecuteState.ExecutePaused);
 				VehicleControl.UpdateExecuteState(ExecuteState.ExecuteSuccessed);
+				
 			}
 		}
 		private void HandleVehicleControlOfResumeControl(IVehicleControl VehicleControl, IVehicleInfo VehicleInfo)
@@ -303,7 +304,7 @@ namespace TrafficControlTest.Module.InterveneCommand
 
 			if (IsVehiclePausedNormalControl(VehicleInfo, rVehicleControlManager))
 			{
-				IVehicleControl correspondingPauseControl = rVehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleInfo.mName).First(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge) && o.mExecuteState == ExecuteState.ExecutePaused);
+				IVehicleControl correspondingPauseControl = rVehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleInfo.mName).First(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge || o.mCommand ==Command.CarDetect) && o.mExecuteState == ExecuteState.ExecutePaused);
 				correspondingPauseControl.UpdateExecuteState(ExecuteState.Unexecute);
 				correspondingPauseControl.UpdateSendState(SendState.Unsend);
 				HandleVehicleControl(correspondingPauseControl);
@@ -357,11 +358,11 @@ namespace TrafficControlTest.Module.InterveneCommand
 		}
 		private static IVehicleControl GetCorrespondingExecutingNormalControl(string VehicleId, IVehicleControlManager VehicleControlManager)
 		{
-			return VehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleId).FirstOrDefault(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge) && (o.mSendState == SendState.Sending || o.mExecuteState == ExecuteState.Executing));
+			return VehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleId).FirstOrDefault(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge || o.mCommand ==Command.CarDetect) && (o.mSendState == SendState.Sending || o.mExecuteState == ExecuteState.Executing));
 		}
 		private static IVehicleControl GetCorrespondingPausedNormalControl(string VehicleId, IVehicleControlManager VehicleControlManager)
 		{
-			return VehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleId).FirstOrDefault(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge) && o.mExecuteState == ExecuteState.ExecutePaused);
+			return VehicleControlManager.GetItems().Where(o => o.mVehicleId == VehicleId).FirstOrDefault(o => (o.mCommand == Command.Goto || o.mCommand == Command.GotoPoint || o.mCommand == Command.GotoTowardPoint || o.mCommand == Command.Charge || o.mCommand == Command.Uncharge || o.mCommand == Command.CarDetect) && o.mExecuteState == ExecuteState.ExecutePaused);
 		}
 		private static IVehicleControl GetCorrespondingExecutingStayControl(string VehicleId, IVehicleControlManager VehicleControlManager)
 		{

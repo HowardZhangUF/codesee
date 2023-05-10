@@ -297,6 +297,9 @@ namespace TrafficControlTest.Module.InterveneCommand
 				case Command.Uncharge:
 					UpdateVehicleControlOfUncharge(VehicleControl, VehicleInfo);
 					break;
+				case Command.CarDetect:
+					UpdateVehicleControlOfCarDetect(VehicleControl, VehicleInfo);
+					break;
 					// 這幾種 Command 不會傳送給車子，所以亦不需要車子的資訊來更新狀態
 					//case Command.Stay:
 					//	break;
@@ -545,6 +548,65 @@ namespace TrafficControlTest.Module.InterveneCommand
 				{
 					VehicleControl.UpdateExecuteState(ExecuteState.ExecuteSuccessed);
 				}
+			}
+		}
+		private void UpdateVehicleControlOfCarDetect(IVehicleControl VehicleControl, IVehicleInfo VehicleInfo)
+		{
+			// 目前傳送 CarDetect 給自走車 (iTS) 時，狀態會變成  -> Abort原本mission -> 傳送障礙車位置->繼續原本mission
+
+			//傳送中
+			if (VehicleControl.mSendState == SendState.Sending)
+			{
+				//狀態Running
+				if (VehicleInfo.mCurrentState == "Running" && VehicleInfo.mCurrentTarget == VehicleControl.mParametersString)
+				{
+					VehicleControl.UpdateSendState(SendState.SendSuccessed);
+					VehicleControl.UpdateExecuteState(ExecuteState.Executing);
+				}
+			}
+			//執行中
+			else if (VehicleControl.mExecuteState == ExecuteState.Executing)
+			{
+				//Alarm 狀態
+				if (VehicleInfo.mCurrentState == "Alarm")
+				{
+					VehicleControl.UpdateExecuteFailedReason(FailedReason.VehicleOccurError);
+					VehicleControl.UpdateExecuteState(ExecuteState.ExecuteFailed);
+				}
+				//充電狀態
+				else if (VehicleInfo.mCurrentState == "Charge" || VehicleInfo.mCurrentState == "ChargeIdle")
+				{
+					VehicleControl.UpdateExecuteFailedReason(FailedReason.VehicleGotoCharge);
+					VehicleControl.UpdateExecuteState(ExecuteState.ExecuteFailed);
+				}
+				else if (VehicleInfo.mCurrentState == "Idle")
+				{
+					bool arrived = false;
+					if (mCheckCoordinateAccuracyAfterArrived)
+					{
+						// 檢查自走車的 Current Target 與座標
+						arrived = VehicleInfo.mCurrentTarget == VehicleControl.mParametersString && IsVehicleArrived(VehicleInfo, VehicleControl.mParameters[0]);
+					}
+					else
+					{
+						// 檢查自走車的 Current Target
+						arrived = VehicleInfo.mCurrentTarget == VehicleControl.mParametersString;
+					}
+
+					if (arrived)
+					{
+						VehicleControl.UpdateExecuteState(ExecuteState.ExecuteSuccessed);
+					}
+					else
+					{
+						VehicleControl.UpdateExecuteFailedReason(FailedReason.VehicleIdleButNotArrived);
+						VehicleControl.UpdateExecuteState(ExecuteState.ExecuteFailed);
+					}
+				}
+				else if(VehicleInfo.mCurrentState == "Pause")
+                {
+					
+                }
 			}
 		}
 		private void Subtask_CheckVehicleControlSendTimeout()

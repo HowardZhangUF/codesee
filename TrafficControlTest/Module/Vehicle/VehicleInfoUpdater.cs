@@ -255,16 +255,19 @@ namespace TrafficControlTest.Module.Vehicle
 			switch (Description)
 			{
 				case EDescription.Idle:
+					return "Idle";
                 case EDescription.Arrived:
                     return "Idle";
 				case EDescription.Charge:
 					return "Charge";
 				case EDescription.Running:
+					return "Running"; 
 				case EDescription.PathPlanning:
 					return "Running";
 				case EDescription.Pause:
 					return "Pause";
 				case EDescription.Alarm:
+					return "Alarm";
 				case EDescription.RouteNotFind:
 				case EDescription.BumperTrigger:
 					return "Alarm";

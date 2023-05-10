@@ -380,6 +380,9 @@ namespace TrafficControlTest.Module.Map
 					case "AutoDoorArea":
 						type = TypeOfMapObjectOfRectangle.AutomaticDoor;
 						break;
+					case "DetectedCarArea"://為了地圖上出現其他廠商的AGV而新增
+						type = TypeOfMapObjectOfRectangle.DetectedCar;
+						break;
 					default:
 						type = TypeOfMapObjectOfRectangle.None;
 						break;
