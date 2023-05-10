@@ -106,11 +106,11 @@
     </Reference>
     <Reference Include="SerialData, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\Howard\source\repos\iTSLibrary\SerialData\obj\Debug\SerialData.dll</HintPath>
+      <HintPath>Include\iTSLibrary\SerialData.dll</HintPath>
     </Reference>
     <Reference Include="Serialization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\Howard\source\repos\iTSLibrary\Serialization\obj\Debug\Serialization.dll</HintPath>
+      <HintPath>Include\iTSLibrary\Serialization.dll</HintPath>
     </Reference>
     <Reference Include="SharpGL, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -170,6 +170,7 @@
     <Compile Include="Module\AutomaticDoor\IAutomaticDoorInfo.cs" />
     <Compile Include="Module\AutomaticDoor\IAutomaticDoorInfoManager.cs" />
     <Compile Include="Module\AutomaticDoor\IAutomaticDoorInfoManagerUpdater.cs" />
+    <Compile Include="Module\CarDetect\CarDetectEventHandler.cs" />
     <Compile Include="Module\ChargeStation\ChargeStationInfo.cs" />
     <Compile Include="Module\ChargeStation\ChargeStationInfoManager.cs" />
     <Compile Include="Module\ChargeStation\ChargeStationInfoManagerUpdater.cs" />
